@@ -166,3 +166,5 @@ textarea { resize: vertical; }
 .teks-panjang .pernyataan h3::before { display: none; }
 .teks-panjang .pernyataan h3 { padding-left: 0; }
 .poin li { align-content: start; }
+.tonton-ulang { margin-top: 16px; }
+.tonton-ulang .video { margin-top: 12px; }

@@ -314,39 +314,50 @@ function isiIdentitas() {
 }
 
 // ---------- video ----------
-const bingkai = new Map(); // window iframe -> isi
+// Pemutar dicari dari halaman tiap kali perlu (contentWindow baru ada setelah iframe terpasang).
+const semuaPemutar = () => [...document.querySelectorAll('.video iframe[data-isi]')];
 let tanyaId = 0, jamPosisi;
 const tunggu = new Map(); // id minta-waktu -> fungsi
 
-function pasangVideo() {
-  if (bingkai.size) return;
-  const wadah = $('daftar-video');
-  for (const v of form.video) {
-    const iframe = el('iframe', { src: `${PEMUTAR}/tonton?isi=${v.isi}`, title: `Pemutar ${v.judul}`, allow: 'fullscreen', loading: 'eager' });
-    const status = el('span', { className: 'status-video', id: `status-${v.isi}` });
-    const urut = form.video.length > 1 ? el('span', { className: 'urut', textContent: `Video ${form.video.indexOf(v) + 1} dari ${form.video.length}` }) : '';
-    const tandai = el('button', { type: 'button', className: 'tombol-dua', textContent: 'Tandai menit ini' });
-    tandai.onclick = async () => {
-      const detik = await mintaWaktu(iframe.contentWindow);
-      if (detik == null) return;
-      const t = { video: v.isi, detik: Math.round(detik), catatan: '', dibuat: new Date().toISOString(), dari: 'tombol' };
-      s.tanda.push(t);
-      simpan();
-      gambarTandaVideo(v.isi);
-      $(`catatan-${t.dibuat}`)?.focus(); // langsung nulis selagi ingat
-    };
-    wadah.append(el('div', { className: 'video' }, el('div', { className: 'video-kepala' }, el('div', {}, urut, el('h3', { textContent: v.judul })), status), iframe,
-      el('div', { className: 'video-bawah' }, el('span', { className: 'kecil', textContent: 'Ada bagian yang keliru atau membingungkan? Tekan saat bagian itu muncul, lalu tulis catatannya (jeda videonya dulu kalau perlu).' }), tandai),
-      el('ol', { className: 'daftar-tanda', id: `tanda-${v.isi}` })));
+// Satu blok pemutar + tombol tandai. ulang = dipakai di langkah Catatan (tonton ulang): tanda baru
+// langsung muncul di daftar Catatan, bukan di bawah video.
+function blokVideo(v, ulang) {
+  const iframe = el('iframe', { src: `${PEMUTAR}/tonton?isi=${v.isi}`, title: `Pemutar ${v.judul}`, allow: 'fullscreen', loading: 'eager' });
+  iframe.dataset.isi = v.isi;
+  const status = ulang ? '' : el('span', { className: 'status-video', id: `status-${v.isi}` });
+  const urut = form.video.length > 1 ? el('span', { className: 'urut', textContent: `Video ${form.video.indexOf(v) + 1} dari ${form.video.length}` }) : '';
+  const tandai = el('button', { type: 'button', className: 'tombol-dua', textContent: 'Tandai menit ini' });
+  tandai.onclick = async () => {
+    const detik = await mintaWaktu(iframe.contentWindow);
+    if (detik == null) return;
+    const t = { video: v.isi, detik: Math.round(detik), catatan: '', dibuat: new Date().toISOString(), dari: ulang ? 'tonton-ulang' : 'tombol' };
+    s.tanda.push(t);
+    simpan();
     gambarTandaVideo(v.isi);
-    bingkai.set(iframe.contentWindow, v.isi);
+    gambarTanda();
+    // langsung nulis selagi ingat
+    (ulang ? $('daftar-tanda') : $(`tanda-${v.isi}`))?.querySelector(`[id="catatan-${t.dibuat}"]`)?.focus();
+  };
+  return el('div', { className: 'video' }, el('div', { className: 'video-kepala' }, el('div', {}, urut, el('h3', { textContent: v.judul })), status), iframe,
+    el('div', { className: 'video-bawah' }, el('span', { className: 'kecil', textContent: 'Ada bagian yang keliru atau membingungkan? Tekan saat bagian itu muncul, lalu tulis catatannya (jeda videonya dulu kalau perlu).' }), tandai),
+    ulang ? '' : el('ol', { className: 'daftar-tanda', id: `tanda-${v.isi}` }));
+}
+
+let videoTerpasang = false;
+function pasangVideo() {
+  if (videoTerpasang) return;
+  videoTerpasang = true;
+  for (const v of form.video) {
+    $('daftar-video').append(blokVideo(v, false));
+    gambarTandaVideo(v.isi);
   }
   perbaruiStatus();
   // Catat posisi tiap 5 detik selama halaman kelihatan: dari sini ketahuan bagian yang diulang/dilewati.
   jamPosisi = setInterval(async () => {
-    if (document.hidden || s.langkah !== 'video') return;
-    for (const [w, isi] of bingkai) {
-      const d = await mintaWaktu(w);
+    if (document.hidden || !['video', 'catatan'].includes(s.langkah)) return;
+    for (const f of semuaPemutar()) {
+      const isi = f.dataset.isi;
+      const d = await mintaWaktu(f.contentWindow);
       const p = s.video[isi].posisi;
       if (d != null && (!p.length || Math.abs(p[p.length - 1][1] - d) > 0.5)) p.push([Date.now() - Date.parse(s.mulai), Math.round(d * 10) / 10]);
     }
@@ -365,7 +376,7 @@ function mintaWaktu(w) {
 
 addEventListener('message', (e) => {
   if (e.origin !== PEMUTAR || e.data?.sumber !== 'wello-h5p') return;
-  const isi = bingkai.get(e.source);
+  const isi = semuaPemutar().find((f) => f.contentWindow === e.source)?.dataset.isi;
   if (!isi) return;
   const d = e.data, v = s.video[isi];
   const ts = Date.now() - Date.parse(s.mulai);
@@ -477,6 +488,13 @@ function gambarTanda() {
 }
 
 function isiCatatan() {
+  // Tonton ulang: pemutar baru dimuat waktu kotaknya dibuka, biar nggak ngunduh video kalau nggak perlu.
+  $('tonton-ulang').addEventListener('toggle', () => {
+    if (!$('tonton-ulang').open || $('video-ulang').childElementCount) return;
+    s.tontonUlang = new Date().toISOString();
+    simpan();
+    $('video-ulang').append(...form.video.map((v) => blokVideo(v, true)));
+  });
   $('catatan').value = s.catatan;
   $('catatan').oninput = (e) => { s.catatan = e.target.value; simpan(); };
   const pilih = $('pilih-video-tanda');
