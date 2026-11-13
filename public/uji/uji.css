@@ -134,13 +134,9 @@ textarea { resize: vertical; }
 .cara ol { margin: 0; padding-left: 22px; }
 .cara li { margin: 6px 0; }
 .cara li b { color: var(--navy-tua); }
+.dibuat { margin: 32px 0 0; font-size: 14px; color: var(--teks-pudar); text-align: center; }
+.dibuat a { color: var(--navy); font-weight: 700; }
 .bilah-dev { position: fixed; top: 8px; right: 8px; z-index: 9; display: flex; flex-wrap: wrap; gap: 4px; align-items: center; max-width: 340px; padding: 8px; border-radius: 12px; background: #2b2b2b; color: #fff; font-size: 13px; box-shadow: var(--bayang); }
 .bilah-dev button, .bilah-dev select { min-height: 28px; width: auto; padding: 2px 8px; border: 0; border-radius: 6px; background: #444; color: #fff; font: inherit; cursor: pointer; }
 .bilah-dev button:hover { background: var(--navy); }
 .isian label.centang { display: flex; margin-top: 4px; font-size: 16px; }
-.medsos { margin: 32px 0 0; text-align: center; font-size: 14px; color: var(--teks-pudar); }
-.medsos p { margin: 0 0 8px; }
-.medsos ul { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 0; padding: 0; list-style: none; }
-.medsos a { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 6px 12px; border-radius: 999px; background: #fff; color: var(--navy); font-weight: 700; text-decoration: none; box-shadow: 0 1px 2px rgb(23 50 74 / .08); }
-.medsos a:hover { background: var(--navy-muda); }
-.medsos svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
