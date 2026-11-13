@@ -252,13 +252,16 @@ function pasangVideo() {
     tandai.onclick = async () => {
       const detik = await mintaWaktu(iframe.contentWindow);
       if (detik == null) return;
-      s.tanda.push({ video: v.isi, detik: Math.round(detik), catatan: '', dibuat: new Date().toISOString(), dari: 'tombol' });
+      const t = { video: v.isi, detik: Math.round(detik), catatan: '', dibuat: new Date().toISOString(), dari: 'tombol' };
+      s.tanda.push(t);
       simpan();
-      tandai.textContent = `Ditandai di ${mmdd(detik)}`;
-      setTimeout(() => { tandai.textContent = 'Tandai menit ini'; }, 2000);
+      gambarTandaVideo(v.isi);
+      $(`catatan-${t.dibuat}`)?.focus(); // langsung nulis selagi ingat
     };
     wadah.append(el('div', { className: 'video' }, el('div', { className: 'video-kepala' }, el('div', {}, urut, el('h3', { textContent: v.judul })), status), iframe,
-      el('div', { className: 'video-bawah' }, el('span', { className: 'kecil', textContent: 'Ada bagian yang keliru atau membingungkan?' }), tandai)));
+      el('div', { className: 'video-bawah' }, el('span', { className: 'kecil', textContent: 'Ada bagian yang keliru atau membingungkan? Tekan saat bagian itu muncul, lalu tulis catatannya (jeda videonya dulu kalau perlu).' }), tandai),
+      el('ol', { className: 'daftar-tanda', id: `tanda-${v.isi}` })));
+    gambarTandaVideo(v.isi);
     bingkai.set(iframe.contentWindow, v.isi);
   }
   perbaruiStatus();
@@ -378,18 +381,22 @@ function hitungButir() {
 
 // ---------- catatan + tanda ----------
 const judulVideo = (isi) => form.video.find((v) => v.isi === isi)?.judul || isi;
+// Satu baris tanda: menit + kotak catatan + hapus. Dipakai di bawah video (waktu nonton) dan di langkah Catatan (cek ulang).
+function barisTanda(t, gambarUlang, tampilAsal) {
+  const catatan = el('input', { id: `catatan-${t.dibuat}`, value: t.catatan, placeholder: 'Apa yang keliru atau membingungkan?', ariaLabel: `Catatan untuk menit ${mmdd(t.detik)}` });
+  catatan.oninput = () => { t.catatan = catatan.value; simpan(); };
+  const hapus = el('button', { type: 'button', className: 'tombol-teks', textContent: 'Hapus' });
+  hapus.onclick = () => { s.tanda.splice(s.tanda.indexOf(t), 1); simpan(); gambarUlang(); };
+  return el('li', {}, el('span', { className: 'waktu', textContent: mmdd(t.detik) }), catatan, hapus,
+    ...(tampilAsal ? [el('span', { className: 'asal', textContent: judulVideo(t.video) })] : []));
+}
+const urutTanda = () => s.tanda.sort((a, b) => a.video.localeCompare(b.video) || a.detik - b.detik);
+function gambarTandaVideo(isi) {
+  $(`tanda-${isi}`)?.replaceChildren(...urutTanda().filter((t) => t.video === isi).map((t) => barisTanda(t, () => gambarTandaVideo(isi), false)));
+}
 function gambarTanda() {
-  const ol = $('daftar-tanda');
-  ol.replaceChildren();
   $('kosong-tanda').hidden = s.tanda.length > 0;
-  s.tanda.sort((a, b) => a.video.localeCompare(b.video) || a.detik - b.detik).forEach((t) => {
-    const catatan = el('input', { value: t.catatan, placeholder: 'Apa yang keliru atau membingungkan?', ariaLabel: `Catatan untuk menit ${mmdd(t.detik)}` });
-    catatan.oninput = () => { t.catatan = catatan.value; simpan(); };
-    const hapus = el('button', { type: 'button', className: 'tombol-teks', textContent: 'Hapus' });
-    hapus.onclick = () => { s.tanda.splice(s.tanda.indexOf(t), 1); simpan(); gambarTanda(); };
-    ol.append(el('li', {}, el('span', { className: 'waktu', textContent: mmdd(t.detik) }), catatan, hapus,
-      ...(form.video.length > 1 ? [el('span', { className: 'asal', textContent: judulVideo(t.video) })] : [])));
-  });
+  $('daftar-tanda').replaceChildren(...urutTanda().map((t) => barisTanda(t, gambarTanda, form.video.length > 1)));
 }
 
 function isiCatatan() {
