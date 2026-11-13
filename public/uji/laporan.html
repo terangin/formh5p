@@ -17,58 +17,63 @@
     <h1 id="judul">Laporan</h1>
     <p class="sub" id="sub"></p>
   </header>
-  <p class="contoh" id="contoh" hidden>DATA CONTOH: bukan jawaban responden asli. Dibuat otomatis untuk melihat tampilan laporan.</p>
+  <p class="contoh" id="contoh" hidden><b>Data contoh.</b> Bukan jawaban responden asli, dibuat otomatis untuk melihat tampilan laporan.</p>
   <nav class="tab-form" id="tab-form" aria-label="Pilih formulir"></nav>
   <p class="galat" id="galat" hidden></p>
 
   <div id="isi" hidden>
-    <section class="kartu-lap">
+    <nav class="loncat" aria-label="Bagian laporan">
+      <a href="#ringkasan">Ringkasan</a><a href="#kelayakan">Kelayakan</a><a href="#sebaran">Per butir</a><a href="#bagian-video">Bagian video</a>
+      <a href="#profil-responden">Profil</a><a href="#masukan">Masukan</a><a href="#terima-kasih">Tanda terima kasih</a><a href="#daftar-responden">Responden</a>
+    </nav>
+
+    <section class="kartu-lap" id="ringkasan">
       <div class="judul-lap"><h2>Ringkasan</h2>
-        <div class="unduh"><button type="button" class="tombol-dua" id="unduh-mentah">Unduh CSV data mentah</button>
-          <button type="button" class="tombol-dua" id="unduh-olahan">Unduh CSV data olahan</button></div></div>
+        <div class="unduh"><button type="button" class="tombol-unduh" id="unduh-mentah">CSV data mentah</button>
+          <button type="button" class="tombol-unduh" id="unduh-olahan">CSV data olahan</button></div></div>
       <div class="ubin" id="ubin"></div>
     </section>
 
-    <section class="kartu-lap">
+    <section class="kartu-lap" id="kelayakan">
       <h2>Kelayakan per aspek</h2>
       <p class="kecil">Persentase = jumlah skor ÷ skor maksimal × 100. Kategori: ≥81 sangat layak, 61–80 layak, 41–60 cukup layak, 21–40 kurang layak, ≤20 tidak layak.</p>
       <div id="aspek"></div>
       <details class="rincian"><summary>Tabel statistik aspek dan reliabilitas (Cronbach's alpha)</summary><div class="gulir" id="tabel-aspek"></div></details>
     </section>
 
-    <section class="kartu-lap">
+    <section class="kartu-lap" id="sebaran">
       <h2>Sebaran jawaban per butir</h2>
-      <p class="kecil">Batang menunjukkan jumlah responden per pilihan. Rata-rata memakai skor; butir 4 pernyataan negatif sehingga skornya dibalik (1 jadi 5). Validitas: korelasi butir dengan total butir lain (terkoreksi) dibandingkan r tabel, α 0,05 dua arah.</p>
+      <p class="kecil">Angka di batang = jumlah responden. Butir 4 pernyataan negatif, skornya dibalik (1 jadi 5) sebelum dirata-rata. Validitas: r butir dengan total butir lain (terkoreksi) dibandingkan r tabel, α 0,05 dua arah.</p>
       <div class="legenda" id="legenda"></div>
       <div id="butir"></div>
       <details class="rincian"><summary>Tabel statistik deskriptif dan validitas per butir</summary><div class="gulir" id="tabel-butir"></div></details>
     </section>
 
-    <section class="kartu-lap">
+    <section class="kartu-lap" id="bagian-video">
       <h2>Bagian video yang ditandai</h2>
-      <p class="kecil">Jumlah tanda dari responden per 30 detik video. Batang tertinggi = bagian yang paling sering dianggap keliru atau membingungkan.</p>
+      <p class="kecil">Jumlah tanda dari responden per 30 detik video. Batang paling gelap = bagian yang paling sering dianggap keliru atau membingungkan.</p>
       <div id="peta"></div>
     </section>
 
-    <section class="kartu-lap">
+    <section class="kartu-lap" id="profil-responden">
       <h2>Profil responden</h2>
       <div class="grid-profil" id="profil"></div>
     </section>
 
-    <section class="kartu-lap">
+    <section class="kartu-lap" id="masukan">
       <h2>Catatan dan masukan umum</h2>
-      <ul class="daftar-catatan" id="catatan"></ul>
+      <div id="catatan"></div>
     </section>
 
-    <section class="kartu-lap">
-      <div class="judul-lap"><h2>Tanda terima kasih</h2><button type="button" class="tombol-dua" id="unduh-hadiah">Unduh CSV penerima</button></div>
+    <section class="kartu-lap" id="terima-kasih">
+      <div class="judul-lap"><h2>Tanda terima kasih</h2><button type="button" class="tombol-unduh" id="unduh-hadiah">CSV penerima</button></div>
       <p class="kecil" id="jumlah-hadiah"></p>
-      <div class="gulir" id="hadiah"></div>
+      <div class="gulir tinggi" id="hadiah"></div>
     </section>
 
-    <section class="kartu-lap">
+    <section class="kartu-lap" id="daftar-responden">
       <h2>Daftar responden</h2>
-      <div class="gulir" id="responden"></div>
+      <div class="gulir tinggi" id="responden"></div>
     </section>
   </div>
 </main>

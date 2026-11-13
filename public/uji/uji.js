@@ -133,10 +133,10 @@ function isiPersetujuan() {
         <li>Perangkat: jenis browser, ukuran layar, zona waktu, dan perkiraan kecepatan internet.</li>
       </ul>
       <h4>Akses dan masa penyimpanan</h4>
-      <p>Data hanya dapat diakses oleh tim peneliti. Email dan nomor WhatsApp hanya dipakai peneliti untuk menghubungi Anda terkait penelitian ini. Data dompet digital hanya dipakai untuk mengirim tanda terima kasih. Data disimpan di server Cloudflare dan dihapus setelah penelitian selesai, paling lambat [tanggal belum ditentukan].</p>
+      <p>Data hanya dapat diakses oleh tim peneliti. Email dan nomor WhatsApp hanya dipakai peneliti untuk menghubungi Anda terkait penelitian ini. Data dompet digital hanya dipakai untuk mengirim tanda terima kasih. Data disimpan di server Cloudflare dan dihapus setelah penelitian selesai.</p>
       <p>Formulir ini disediakan Nyalain (dari Terangin). Nyalain tidak memakai data Anda untuk keperluan lain dan tidak mengirimi Anda promosi.</p>
     </details>
-    <p class="kecil">Pertanyaan mengenai penelitian ini dapat disampaikan kepada peneliti: [nama dan kontak peneliti belum dikasih].</p>
+    <p class="kecil">Pertanyaan mengenai penelitian ini dapat disampaikan kepada peneliti: <span id="kontak-peneliti"></span>.</p>
     <div class="pernyataan">
       <h3>Pernyataan persetujuan</h3>
       <p>Dengan mencentang kotak di bawah ini, saya menyatakan bahwa:</p>
@@ -148,6 +148,7 @@ function isiPersetujuan() {
       </ol>
     </div>`;
   $('teks-persetujuan').querySelector('b').textContent = form.matkul;
+  $('kontak-peneliti').textContent = form.kontak.map(([nama, hp]) => `${nama} (${hp})`).join(' atau ');
   const tombol = $('lanjut-persetujuan');
   const atur = () => { tombol.disabled = !s.persetujuan || !(s.terdaftar || LOKAL || tokenTurnstile); };
   $('setuju').checked = !!s.persetujuan;
