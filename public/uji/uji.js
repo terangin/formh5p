@@ -9,11 +9,11 @@ const FORM = {
     video: [{ isi: 'tp1-8a082ca8', judul: 'Video 1' }, { isi: 'tp2-3a0b90ab', judul: 'Video 2' }],
   },
   'ut-bindo-1': {
-    matkul: 'Bahasa Indonesia', prodi: 'Pendidikan Bahasa Indonesia', periksa: 'Periksa', majuDikunci: true,
+    matkul: 'Bahasa Indonesia', prodi: 'Pendidikan Bahasa dan Sastra Indonesia', periksa: 'Periksa', majuDikunci: true,
     video: [{ isi: 'bi1-67b38ac4', judul: 'Ketika Perbedaan Menjadi Solusi' }],
   },
   'ut-bindo-2': {
-    matkul: 'Bahasa Indonesia', prodi: 'Pendidikan Bahasa Indonesia', periksa: 'Periksa', majuDikunci: true,
+    matkul: 'Bahasa Indonesia', prodi: 'Pendidikan Bahasa dan Sastra Indonesia', periksa: 'Periksa', majuDikunci: true,
     video: [{ isi: 'bi2-f51501ab', judul: 'Batik Bercerita: Sebuah Wawancara tentang Warisan Indonesia' }],
   },
   'ut-arab': {
@@ -58,6 +58,23 @@ const BUTIR = [
     'Saya ingin video dengan gaya penyajian seperti ini tersedia pada mata kuliah lain',
   ]],
 ];
+
+// Daftar resmi dari ut.ac.id/program-studi dan ut.ac.id/ut-daerah (dicek 13 Nov 2026). Pilihan tetap,
+// tanpa isian bebas, biar data nggak perlu dibersihin. Mata Kuliah Umum, PPG, dan prodi SV yang baru buka 2027 nggak dimasukin.
+const PRODI = [
+  ['FKIP', ['Pendidikan Bahasa dan Sastra Indonesia', 'Pendidikan Bahasa Inggris', 'Pendidikan Biologi', 'Pendidikan Fisika', 'Pendidikan Kimia',
+    'Pendidikan Matematika', 'Pendidikan Ekonomi', 'Pendidikan Pancasila dan Kewarganegaraan', 'Teknologi Pendidikan',
+    'Pendidikan Guru Sekolah Dasar (PGSD)', 'Pendidikan Guru Pendidikan Anak Usia Dini (PGPAUD)', 'Pendidikan Agama Islam (PAI)']],
+  ['FEB', ['Manajemen', 'Ekonomi Pembangunan', 'Ekonomi Syariah', 'Akuntansi', 'Akuntansi Keuangan Publik', 'Pariwisata', 'Kewirausahaan']],
+  ['FHISIP', ['Ilmu Administrasi Publik', 'Administrasi Bisnis', 'Hukum', 'Ilmu Pemerintahan', 'Ilmu Komunikasi',
+    'Perpustakaan dan Sains Informasi', 'Sosiologi', 'Sastra Inggris', 'Perpajakan']],
+  ['FST', ['Statistika', 'Matematika', 'Biologi', 'Teknologi Pangan', 'Agribisnis', 'Perencanaan Wilayah dan Kota', 'Sistem Informasi', 'Sains Data']],
+  ['Sekolah Vokasi', ['D3 Perpajakan', 'D4 Kearsipan']],
+];
+const UPBJJ = ['Banda Aceh', 'Medan', 'Batam', 'Padang', 'Pangkalpinang', 'Pekanbaru', 'Jambi', 'Palembang', 'Bengkulu', 'Bandar Lampung',
+  'Jakarta', 'Jakarta 2', 'Serang', 'Bogor', 'Bandung', 'Purwokerto', 'Semarang', 'Surakarta', 'Yogyakarta', 'Surabaya', 'Malang', 'Jember',
+  'Denpasar', 'Mataram', 'Kupang', 'Pontianak', 'Palangka Raya', 'Banjarmasin', 'Samarinda', 'Makassar', 'Majene', 'Palu', 'Kendari',
+  'Manado', 'Gorontalo', 'Ambon', 'Ternate', 'Jayapura', 'Sorong', 'Tarakan', 'Luar Negeri'];
 
 const LANGKAH = ['persetujuan', 'identitas', 'video', 'angket', 'catatan'];
 const NAMA_LANGKAH = ['Persetujuan', 'Identitas', 'Tonton', 'Angket', 'Catatan'];
@@ -206,6 +223,8 @@ function isiPersetujuan() {
 // ---------- identitas ----------
 function isiIdentitas() {
   const f = $('form-identitas');
+  f.elements.prodi.append(...PRODI.map(([fak, daftar]) => el('optgroup', { label: fak }, ...daftar.map((p) => el('option', { textContent: p })))));
+  f.elements.upbjj.append(...UPBJJ.map((u) => el('option', { textContent: u })));
   if (!s.identitas.tanggal) s.identitas.tanggal = new Date().toLocaleDateString('sv-SE');
   if (!s.identitas.prodi && form.prodi) s.identitas.prodi = form.prodi;
   for (const [k, v] of Object.entries(s.identitas)) {
