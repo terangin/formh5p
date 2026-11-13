@@ -174,34 +174,44 @@ function isiPersetujuan() {
   // Perkiraan: lama video + sekitar 15 menit isi identitas dan angket, dibulatkan ke 5 menit.
   const menit = Math.ceil((form.video.reduce((a, v) => a + v.detik, 0) / 60 + 15) / 5) * 5;
   $('teks-persetujuan').innerHTML = `
-    <p class="pengantar">Tim peneliti FKIP Universitas Terbuka sedang menguji video pembelajaran mata kuliah <b></b> sebelum dipakai lebih luas. Ringkasnya:</p>
+    <p class="pengantar">Tim peneliti Fakultas Keguruan dan Ilmu Pendidikan (FKIP) Universitas Terbuka mengundang Anda berpartisipasi dalam uji coba video pembelajaran mata kuliah <b></b>. Uji coba ini bertujuan menemukan kesalahan, bagian yang membingungkan, dan kendala teknis sebelum video digunakan secara lebih luas.</p>
     <ul class="poin">
       <li><b>Sekitar ${menit} menit</b><span>termasuk menonton ${nVideo}</span></li>
-      <li><b>Sukarela</b><span>boleh berhenti kapan saja</span></li>
+      <li><b>Sukarela</b><span>Anda dapat berhenti kapan saja</span></li>
       <li><b>Tidak memengaruhi nilai</b><span>tidak ada jawaban benar atau salah</span></li>
-      <li><b>Hanya untuk peneliti</b><span>hasil dilaporkan tanpa nama</span></li>
+      <li><b>Kerahasiaan terjaga</b><span>hasil dilaporkan tanpa menyebut nama</span></li>
     </ul>
-    <h3>Yang Anda lakukan</h3>
+    <h3>Prosedur</h3>
     <ol class="alur">
-      <li>Isi identitas</li>
-      <li>Tonton ${nVideo} sampai selesai</li>
-      <li>Isi 25 pernyataan</li>
-      <li>Tulis catatan, boleh dikosongkan</li>
+      <li>Mengisi identitas</li>
+      <li>Menonton ${nVideo} sampai selesai</li>
+      <li>Mengisi 25 pernyataan</li>
+      <li>Menulis catatan (opsional)</li>
     </ol>
-    <p class="kecil">Bila bersedia, Anda bisa dihubungi untuk wawancara lanjutan.</p>
+    <p class="kecil">Apabila bersedia, Anda dapat dihubungi untuk wawancara lanjutan.</p>
     <details class="rincian">
-      <summary>Rincian data yang dicatat dan cara penyimpanannya</summary>
-      <h4>Data yang dicatat</h4>
+      <summary>Rincian data yang dikumpulkan dan penyimpanannya</summary>
+      <h4>Data yang dikumpulkan</h4>
       <ul>
         <li>Isian Anda: identitas (termasuk email, dan nomor WhatsApp bila Anda bersedia diwawancara), jawaban angket, catatan, dan menit yang Anda tandai.</li>
         <li>Selama menonton: bagian video yang diputar, diulang, atau dilewati, dan jawaban kuis di dalam video.</li>
         <li>Perangkat: jenis browser, ukuran layar, zona waktu, dan perkiraan kecepatan internet.</li>
       </ul>
-      <h4>Siapa yang melihat dan berapa lama disimpan</h4>
-      <p>Data hanya bisa dilihat tim peneliti. Email dan nomor WhatsApp hanya dipakai peneliti untuk menghubungi Anda terkait penelitian ini. Data disimpan di server Cloudflare dan dihapus setelah penelitian selesai, paling lambat [tanggal belum ditentukan].</p>
+      <h4>Akses dan masa penyimpanan</h4>
+      <p>Data hanya dapat diakses oleh tim peneliti. Email dan nomor WhatsApp hanya dipakai peneliti untuk menghubungi Anda terkait penelitian ini. Data disimpan di server Cloudflare dan dihapus setelah penelitian selesai, paling lambat [tanggal belum ditentukan].</p>
       <p>Formulir ini disediakan Nyalain (dari Terangin). Nyalain tidak memakai data Anda untuk keperluan lain dan tidak mengirimi Anda promosi.</p>
     </details>
-    <p class="kecil">Ada pertanyaan? Hubungi peneliti: [nama dan kontak peneliti belum dikasih].</p>`;
+    <p class="kecil">Pertanyaan mengenai penelitian ini dapat disampaikan kepada peneliti: [nama dan kontak peneliti belum dikasih].</p>
+    <div class="pernyataan">
+      <h3>Pernyataan persetujuan</h3>
+      <p>Dengan mencentang kotak di bawah ini, saya menyatakan bahwa:</p>
+      <ol>
+        <li>Saya telah membaca dan memahami penjelasan mengenai tujuan, prosedur, serta penggunaan data dalam uji coba ini.</li>
+        <li>Saya bersedia berpartisipasi secara sukarela tanpa paksaan dari pihak mana pun.</li>
+        <li>Saya memahami bahwa saya dapat mengundurkan diri kapan saja tanpa konsekuensi terhadap nilai akademik saya.</li>
+        <li>Saya mengizinkan data yang saya berikan digunakan untuk keperluan penelitian ini sebagaimana dijelaskan di atas.</li>
+      </ol>
+    </div>`;
   $('teks-persetujuan').querySelector('b').textContent = form.matkul;
   const tombol = $('lanjut-persetujuan');
   const atur = () => { tombol.disabled = !s.persetujuan || !(s.terdaftar || LOKAL || tokenTurnstile); };

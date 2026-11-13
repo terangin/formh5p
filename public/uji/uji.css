@@ -158,3 +158,10 @@ textarea { resize: vertical; }
 .rincian summary::-webkit-details-marker { display: none; }
 .rincian summary::before { content: "▸"; transition: transform .15s; }
 .rincian[open] summary::before { transform: rotate(90deg); }
+.pernyataan { margin-top: 18px; padding: 14px 16px 6px; border-radius: 12px; background: #fff; border: 1.5px solid var(--navy); }
+.pernyataan h3 { margin: 0 0 6px; }
+.pernyataan p { margin: 0 0 6px; }
+.pernyataan ol { margin: 0 0 8px; padding-left: 22px; }
+.pernyataan li { margin: 4px 0; }
+.teks-panjang .pernyataan h3::before { display: none; }
+.teks-panjang .pernyataan h3 { padding-left: 0; }
