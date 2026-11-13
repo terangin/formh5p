@@ -96,6 +96,7 @@ export function csv(baris, videoForm) {
     ['menit_mengisi', (b) => (b.selesai ? bulat((Date.parse(b.selesai) - Date.parse(b.mulai)) / 60000, 1) : '')],
     ...['nama', 'nim', 'email', 'prodi', 'semester', 'upbjj', 'pekerjaan', 'perangkat', 'perangkat_lain', 'tanggal'].map((k) => [k, (b) => b.identitas?.[k] ?? '']),
     ['bersedia_wawancara', (b) => (b.identitas?.bersedia_wawancara ? 'ya' : 'tidak')], ['whatsapp', (b) => b.identitas?.whatsapp ?? ''],
+    ['mau_tanda_terima_kasih', (b) => (b.hadiah?.mau ? 'ya' : 'tidak')], ['dompet', (b) => b.hadiah?.dompet ?? ''], ['nomor_dompet', (b) => b.hadiah?.nomor ?? ''], ['nama_akun_dompet', (b) => b.hadiah?.nama ?? ''],
     ...Array.from({ length: 25 }, (_, i) => [`b${i + 1}`, (b) => b.butir?.[i + 1] ?? '']),
     ...ASPEK.map(([nama, nomor], i) => [`persen_${'ABCD'[i]}`, (b) => {
       const v = nomor.map((no) => b.butir?.[no]).filter((x) => x >= 1 && x <= 5);
@@ -192,4 +193,14 @@ export function csvOlahan(baris) {
     baris1.push(['aspek', a.nama, a.n, '', '', '', '', '', a.rataSkor, a.sd, '', '', a.maks, '', '', '', pk.persen, pk.kategori, a.alpha, tafsirAlpha(a.alpha)]);
   });
   return '﻿' + baris1.map((x) => x.map(sel).join(',')).join('\r\n');
+}
+
+// Daftar penerima tanda terima kasih: cuma responden lengkap yang mencentang. Buat dipakai waktu transfer.
+export const penerimaHadiah = (baris) => baris.filter((b) => b.selesai && b.hadiah?.mau)
+  .map((b) => ({ id: b.id, nama: b.identitas?.nama, nim: b.identitas?.nim, dompet: b.hadiah.dompet, nomor: b.hadiah.nomor, namaAkun: b.hadiah.nama, selesai: b.selesai }))
+  .sort((a, b) => a.selesai.localeCompare(b.selesai));
+export function csvHadiah(baris) {
+  const sel = (x) => { const s = String(x ?? ''); return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
+  return '﻿' + [['nama', 'nim', 'dompet', 'nomor', 'nama_akun', 'selesai', 'id'], ...penerimaHadiah(baris).map((p) => [p.nama, p.nim, p.dompet, p.nomor, p.namaAkun, p.selesai, p.id])]
+    .map((x) => x.map(sel).join(',')).join('\r\n');
 }

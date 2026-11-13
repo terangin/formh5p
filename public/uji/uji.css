@@ -173,3 +173,8 @@ textarea { resize: vertical; }
 .rincian[open] { padding-bottom: 18px; }
 .tonton-ulang .video + .video { margin-top: 28px; padding-top: 22px; border-top: 1px solid var(--garis); }
 .judul-manual { margin: 22px 0 4px; font-size: 16px; color: var(--navy-tua); }
+.hadiah { margin-top: 24px; padding: 16px; border-radius: 14px; background: var(--kuning-muda); }
+.hadiah h3 { margin: 0 0 4px; }
+.hadiah .kecil { margin: 0 0 8px; }
+.hadiah .centang { background: #fff; }
+.isian label.kecil-centang { font-size: 15px; padding: 10px 12px; margin: 0; }

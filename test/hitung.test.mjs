@@ -62,3 +62,11 @@ test('validitas: butir yang searah total valid', () => {
   assert.equal(s[0].valid, true);
   assert.equal(s[3].valid, true); // butir negatif dibalik dulu, jadi tetap searah
 });
+
+import { penerimaHadiah, csvHadiah } from '../public/uji/hitung.js';
+test('penerima tanda terima kasih: cuma yang lengkap dan mau', () => {
+  const b = (id, selesai, mau) => ({ id, selesai, identitas: { nama: id }, hadiah: mau ? { mau: true, dompet: 'DANA', nomor: '0812', nama: id } : { mau: false } });
+  const p = penerimaHadiah([b('a', '2026-11-20T10:00:00Z', true), b('b', null, true), b('c', '2026-11-20T09:00:00Z', false)]);
+  assert.deepEqual(p.map((x) => x.id), ['a']);
+  assert.equal(csvHadiah([b('a', '2026-11-20T10:00:00Z', true)]).split('\r\n').length, 2);
+});

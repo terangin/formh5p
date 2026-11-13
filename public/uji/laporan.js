@@ -1,7 +1,7 @@
 // Laporan peneliti. Lokal (localhost): pakai data CONTOH dari dummy.js. Situs asli: ambil dari API (belum dibikin,
 // nunggu login peneliti). Semua isian responden ditulis lewat textContent, jangan innerHTML (A05).
 import { FORM, BUTIR } from './konfig.js';
-import { ringkas, petaTanda, csv, csvOlahan, statistikButir, statistikAspek, tafsirAlpha } from './hitung.js';
+import { ringkas, petaTanda, csv, csvOlahan, csvHadiah, penerimaHadiah, statistikButir, statistikAspek, tafsirAlpha } from './hitung.js';
 
 const LOKAL = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
 const SKALA = ['Sangat tidak setuju', 'Tidak setuju', 'Ragu-ragu', 'Setuju', 'Sangat setuju'];
@@ -103,7 +103,13 @@ function tampil(kode, baris) {
       b.selesai ? 'Lengkap' : 'Belum selesai', new Date(b.mulai).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' }),
       b.selesai ? angka((Date.parse(b.selesai) - Date.parse(b.mulai)) / 60000, 0) : '–', b.identitas?.bersedia_wawancara ? 'Ya' : 'Tidak', b.identitas?.whatsapp])));
 
+  const penerima = penerimaHadiah(baris);
+  $('jumlah-hadiah').textContent = `${penerima.length} responden lengkap ingin dihubungi untuk menerima tanda terima kasih.`;
+  $('hadiah').replaceChildren(tabel(['Nama', 'NIM', 'Dompet digital', 'Nomor', 'Nama pemilik akun', 'Selesai mengisi'],
+    penerima.map((p) => [p.nama, p.nim, p.dompet, p.nomor, p.namaAkun, new Date(p.selesai).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' })])));
+
   const tgl = new Date().toISOString().slice(0, 10);
+  $('unduh-hadiah').onclick = () => unduh(`${kode}-tanda-terima-kasih-${tgl}.csv`, csvHadiah(baris));
   $('unduh-mentah').onclick = () => unduh(`${kode}-mentah-${tgl}.csv`, csv(baris, form.video));
   $('unduh-olahan').onclick = () => unduh(`${kode}-olahan-${tgl}.csv`, csvOlahan(baris));
   $('isi').hidden = false;

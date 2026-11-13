@@ -48,6 +48,7 @@ export function buatDummy(kode, form, n = 42) {
         perangkat: pilihBobot(r, ['HP Android', 'Laptop', 'HP iOS (iPhone)', 'PC', 'Tablet'], [9, 5, 2, 1, 1]),
         tanggal: new Date(mulai).toISOString().slice(0, 10), bersedia_wawancara: bersedia, ...(bersedia ? { whatsapp: `0812000${String(i).padStart(5, '0')}` } : {}),
       },
+      hadiah: lengkap && r() < 0.6 ? { mau: true, dompet: ['GoPay', 'OVO', 'DANA', 'ShopeePay'][Math.floor(r() * 4)], nomor: `0813000${String(i).padStart(5, '0')}`, nama: `Responden Contoh ${i + 1}` } : { mau: false },
       butir, catatan: lengkap ? UMUM[Math.floor(r() * UMUM.length)] : '', tanda: lengkap ? tanda : [],
       lewatiVideo,
       video: Object.fromEntries(form.video.map((v) => [v.isi, { durasi: v.detik, selesai: lengkap && !lewatiVideo ? 1 + (r() < 0.2 ? 1 : 0) : 0, posisi: [],

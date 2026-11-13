@@ -2,6 +2,7 @@
 // Video diputar pemutar Wello (h5p.wello.web.id/tonton) di iframe; protokol postMessage
 // ada di kepala tonton.js repo h5p-player. Versi coba: semua data baru disimpan di localStorage.
 import { FORM, BUTIR, PRODI, UPBJJ } from './konfig.js';
+import { pasangHadiah, periksaHadiah } from './hadiah.js';
 
 const PEMUTAR = location.hostname === 'localhost' ? 'http://localhost:8093' : 'https://h5p.wello.web.id';
 
@@ -127,11 +128,12 @@ function isiPersetujuan() {
       <h4>Data yang dikumpulkan</h4>
       <ul>
         <li>Isian Anda: identitas (termasuk email, dan nomor WhatsApp bila Anda bersedia diwawancara), jawaban angket, catatan, dan menit yang Anda tandai.</li>
+        <li>Bila Anda ingin menerima tanda terima kasih: jenis dompet digital, nomor, dan nama pemilik akun.</li>
         <li>Selama menonton: bagian video yang diputar, diulang, atau dilewati, dan jawaban kuis di dalam video.</li>
         <li>Perangkat: jenis browser, ukuran layar, zona waktu, dan perkiraan kecepatan internet.</li>
       </ul>
       <h4>Akses dan masa penyimpanan</h4>
-      <p>Data hanya dapat diakses oleh tim peneliti. Email dan nomor WhatsApp hanya dipakai peneliti untuk menghubungi Anda terkait penelitian ini. Data disimpan di server Cloudflare dan dihapus setelah penelitian selesai, paling lambat [tanggal belum ditentukan].</p>
+      <p>Data hanya dapat diakses oleh tim peneliti. Email dan nomor WhatsApp hanya dipakai peneliti untuk menghubungi Anda terkait penelitian ini. Data dompet digital hanya dipakai untuk mengirim tanda terima kasih. Data disimpan di server Cloudflare dan dihapus setelah penelitian selesai, paling lambat [tanggal belum ditentukan].</p>
       <p>Formulir ini disediakan Nyalain (dari Terangin). Nyalain tidak memakai data Anda untuk keperluan lain dan tidak mengirimi Anda promosi.</p>
     </details>
     <p class="kecil">Pertanyaan mengenai penelitian ini dapat disampaikan kepada peneliti: [nama dan kontak peneliti belum dikasih].</p>
@@ -480,6 +482,10 @@ function isiCatatan() {
   );
   $('kirim').onclick = async () => {
     const tombol = $('kirim');
+    const galatHadiah = periksaHadiah({ s, $ });
+    $('galat-hadiah').textContent = galatHadiah || '';
+    $('galat-hadiah').hidden = !galatHadiah;
+    if (galatHadiah) return;
     tombol.disabled = true;
     tombol.textContent = 'Mengirim...';
     s.selesai = new Date().toISOString();
@@ -525,6 +531,7 @@ if (!form) {
   $('sub-form').textContent = form.video.length > 1 ? `${form.video.length} video, satu angket` : form.video[0].judul;
   $('langkah').append(...NAMA_LANGKAH.map((t) => el('li', {}, el('span', { textContent: t }))));
   isiPersetujuan(); isiIdentitas(); isiVideo(); isiAngket(); isiCatatan();
+  pasangHadiah({ s, simpan, $ });
   if (!s.selesai) mulaiJamPosisi();
   $('versi-coba').hidden = !LOKAL;
   if (LOKAL) pasangBilahDev();

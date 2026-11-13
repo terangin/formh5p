@@ -131,6 +131,22 @@
       <ul class="penjelasan-ulang" id="penjelasan-ulang"></ul>
       <div id="video-ulang"></div>
     </details>
+    <div class="hadiah">
+      <h3>Tanda terima kasih (opsional)</h3>
+      <p class="kecil">Peneliti menyediakan tanda terima kasih berupa saldo dompet digital bagi responden. Ketentuan pemberiannya akan diinformasikan oleh peneliti.</p>
+      <form id="form-hadiah" class="isian" novalidate>
+        <label class="centang"><input type="checkbox" name="mau"> Saya ingin dihubungi untuk menerima tanda terima kasih</label>
+        <div id="isian-hadiah" class="isian" hidden>
+          <label>Jenis dompet digital
+            <select name="dompet"><option value="">Pilih</option></select>
+          </label>
+          <label>Nomor yang terdaftar di dompet digital <input name="nomor" type="tel" inputmode="tel" autocomplete="tel" placeholder="08xxxxxxxxxx"></label>
+          <label class="centang kecil-centang"><input type="checkbox" id="pakai-wa"> Sama dengan nomor WhatsApp yang saya isi</label>
+          <label>Nama pemilik akun <input name="nama" autocomplete="name"></label>
+        </div>
+      </form>
+    </div>
+    <p class="galat" id="galat-hadiah" hidden></p>
     <p class="galat" id="galat-kirim" hidden>Jawaban belum terkirim. Cek internet Anda lalu tekan Kirim lagi. Isian Anda tetap tersimpan di perangkat ini.</p>
     <div class="aksi"><button type="button" class="tombol" id="kirim">Kirim jawaban</button></div>
   </section>
