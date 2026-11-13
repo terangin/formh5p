@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Uji Coba Video Pembelajaran</title>
+<link rel="stylesheet" href="/uji/uji.css">
+<script type="module" src="/uji/uji.js"></script>
+</head>
+<body>
+<main class="halaman">
+  <p id="galat-form" class="galat" hidden></p>
+
+  <header class="kepala" id="kepala" hidden>
+    <p class="label">Uji coba video pembelajaran · Universitas Terbuka</p>
+    <h1 id="judul-form"></h1>
+    <p class="sub" id="sub-form"></p>
+  </header>
+  <nav class="langkah" aria-label="Langkah pengisian">
+    <p class="langkah-ke" id="langkah-ke"></p>
+    <ol id="langkah"></ol>
+  </nav>
+
+  <!-- 1. Persetujuan -->
+  <section data-langkah="persetujuan" hidden>
+    <h2>Lembar persetujuan</h2>
+    <div class="teks-panjang" id="teks-persetujuan"></div>
+    <label class="centang"><input type="checkbox" id="setuju"> Saya sudah membaca penjelasan di atas dan bersedia ikut uji coba ini.</label>
+    <div class="aksi">
+      <button type="button" class="tombol" id="lanjut-persetujuan" disabled>Lanjut</button>
+      <button type="button" class="tombol-teks" id="tolak">Saya tidak bersedia</button>
+    </div>
+  </section>
+
+  <section data-langkah="tolak" hidden>
+    <h2>Terima kasih</h2>
+    <p>Anda memilih tidak ikut. Tidak ada data yang dikirim. Halaman ini boleh ditutup.</p>
+  </section>
+
+  <!-- 2. Identitas -->
+  <section data-langkah="identitas" hidden>
+    <h2>Identitas responden</h2>
+    <form id="form-identitas" class="isian" novalidate>
+      <label>Nama <input name="nama" required autocomplete="name"></label>
+      <label>NIM <input name="nim" required inputmode="numeric" autocomplete="off"></label>
+      <label>Program studi
+        <select name="prodi" required>
+          <option value="">Pilih</option>
+          <option>Teknologi Pendidikan</option>
+          <option>Pendidikan Agama Islam</option>
+          <option>Pendidikan Bahasa Indonesia</option>
+          <option value="lainnya">Lainnya</option>
+        </select>
+      </label>
+      <label data-lainnya="prodi" hidden>Program studi lainnya <input name="prodi_lain"></label>
+      <label>Semester <input name="semester" required inputmode="numeric" maxlength="2"></label>
+      <label>UPBJJ
+        <select name="upbjj" required>
+          <option value="">Pilih</option>
+          <option>Jakarta</option>
+          <option>Bogor</option>
+          <option value="lainnya">Lainnya</option>
+        </select>
+      </label>
+      <label data-lainnya="upbjj" hidden>UPBJJ lainnya <input name="upbjj_lain"></label>
+      <label>Pekerjaan <input name="pekerjaan" required></label>
+      <label>Perangkat yang digunakan
+        <select name="perangkat" required>
+          <option value="">Pilih</option>
+          <option>HP Android</option>
+          <option>HP iOS (iPhone)</option>
+          <option>PC</option>
+          <option>Laptop</option>
+          <option>Tablet</option>
+          <option value="lainnya">Lainnya</option>
+        </select>
+      </label>
+      <label data-lainnya="perangkat" hidden>Perangkat lainnya <input name="perangkat_lain"></label>
+      <label>Tanggal uji coba <input name="tanggal" type="date" required></label>
+      <p class="galat" id="galat-identitas" hidden></p>
+      <div class="aksi"><button class="tombol">Lanjut</button></div>
+    </form>
+  </section>
+
+  <!-- 3. Nonton -->
+  <section data-langkah="video" hidden>
+    <h2>Tonton videonya</h2>
+    <ul class="petunjuk">
+      <li>Tonton video sampai selesai. Pada penayangan pertama, tonton tanpa mencatat.</li>
+      <li>Setelah itu Anda boleh menonton ulang. Tekan <b>Tandai menit ini</b> di bagian yang keliru atau membingungkan, lalu tulis catatannya.</li>
+      <li>Video boleh ditonton berulang kali.</li>
+    </ul>
+    <div id="daftar-video"></div>
+    <p class="galat" id="galat-video" hidden></p>
+    <div class="aksi">
+      <button type="button" class="tombol" id="lanjut-video">Lanjut ke angket</button>
+      <button type="button" class="tombol-teks" id="lewati-video" hidden>Video tidak bisa diputar sampai habis? Lanjut saja</button>
+    </div>
+  </section>
+
+  <!-- 4. Angket -->
+  <section data-langkah="angket" hidden>
+    <h2>Angket</h2>
+    <p>Pilih angka yang paling sesuai dengan pendapat Anda. Tidak ada jawaban benar atau salah. Jawaban Anda tidak memengaruhi nilai mata kuliah.</p>
+    <div id="daftar-butir"></div>
+    <p class="hitung" id="hitung-butir" aria-live="polite"></p>
+    <p class="galat" id="galat-angket" hidden></p>
+    <div class="aksi"><button type="button" class="tombol" id="lanjut-angket">Lanjut</button></div>
+  </section>
+
+  <!-- 5. Catatan -->
+  <section data-langkah="catatan" hidden>
+    <h2>E. Catatan atau masukan</h2>
+    <label class="isian">Catatan atau masukan untuk video ini (boleh dikosongkan)
+      <textarea id="catatan" rows="5"></textarea>
+    </label>
+    <h3>Bagian yang Anda tandai</h3>
+    <p class="kecil" id="kosong-tanda">Belum ada. Anda bisa menandai menit waktu menonton, atau tambahkan di sini.</p>
+    <ol class="daftar-tanda" id="daftar-tanda"></ol>
+    <form class="tambah-tanda" id="form-tanda">
+      <label>Video <select name="video" id="pilih-video-tanda"></select></label>
+      <label>Menit (mm:dd) <input name="menit" placeholder="03:15" pattern="\d{1,3}:[0-5]\d" required></label>
+      <button class="tombol-dua">Tambah</button>
+    </form>
+    <p class="galat" id="galat-kirim" hidden>Jawaban belum terkirim. Cek internet Anda lalu tekan Kirim lagi. Isian Anda tetap tersimpan di perangkat ini.</p>
+    <div class="aksi"><button type="button" class="tombol" id="kirim">Kirim jawaban</button></div>
+  </section>
+
+  <section data-langkah="selesai" hidden>
+    <h2>Terima kasih</h2>
+    <p>Jawaban Anda sudah kami terima. Anda mungkin akan dihubungi untuk wawancara lanjutan sesuai penjelasan di lembar persetujuan.</p>
+    <p class="draf">[Tempat kalimat promosi Nyalain. Kalimatnya ditawarkan dulu ke pemilik, belum dipasang.]</p>
+  </section>
+
+  <p class="versi-coba" id="versi-coba" hidden>Versi coba di laptop: jawaban cuma tersimpan di browser ini, tidak dikirim ke server.</p>
+</main>
+</body>
+</html>
