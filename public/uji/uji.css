@@ -111,7 +111,6 @@ textarea { resize: vertical; }
 .tambah-tanda { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; margin-top: 14px; padding: 14px; border: 1.5px dashed #a9bac8; border-radius: 14px; }
 .tambah-tanda label { display: grid; gap: 4px; flex: 1 1 160px; font-size: 15px; font-weight: 800; color: var(--navy-tua); }
 
-.draf { border: 2px dashed var(--teks-pudar); border-radius: 12px; padding: 12px; color: var(--teks-pudar); }
 .versi-coba { margin-top: 40px; font-size: 14px; color: var(--teks-pudar); text-align: center; }
 
 @media (max-width: 600px) {
@@ -133,3 +132,5 @@ textarea { resize: vertical; }
 .cara ol { margin: 0; padding-left: 22px; }
 .cara li { margin: 6px 0; }
 .cara li b { color: var(--navy-tua); }
+.dibuat { margin: 32px 0 0; font-size: 14px; color: var(--teks-pudar); text-align: center; }
+.dibuat a { color: var(--navy); font-weight: 700; }
