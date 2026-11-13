@@ -504,6 +504,14 @@ function gambarTanda() {
 }
 
 function isiCatatan() {
+  $('penjelasan-ulang').replaceChildren(...[
+    'Bagian ini tidak wajib. Penayangan pertama Anda sudah tercatat.',
+    'Video tidak perlu ditonton sampai selesai lagi, dan soal di dalam video yang sudah Anda jawab tidak perlu dijawab ulang.',
+    form.majuDikunci
+      ? 'Video ini tidak bisa dilompati ke depan, jadi putar dari awal sampai bagian yang ingin ditandai. Soal yang muncul boleh dilewati dengan menekan tombol putar.'
+      : 'Geser atau putar video ke bagian yang ingin ditandai.',
+    'Tekan Tandai menit ini, lalu tulis catatannya di daftar di atas.',
+  ].map((t) => el('li', { textContent: t })));
   // Tonton ulang: pemutar baru dimuat waktu kotaknya dibuka, biar nggak ngunduh video kalau nggak perlu.
   $('tonton-ulang').addEventListener('toggle', () => {
     // Ditutup = pemutar dibuang (pemutar nggak punya perintah jeda dari luar, jadi ini satu-satunya cara berhentiin).

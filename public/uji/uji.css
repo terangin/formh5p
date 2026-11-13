@@ -168,3 +168,7 @@ textarea { resize: vertical; }
 .poin li { align-content: start; }
 .tonton-ulang { margin-top: 16px; }
 .tonton-ulang .video { margin-top: 12px; }
+.penjelasan-ulang { margin: 4px 0 8px; padding: 12px 14px 12px 32px; border-radius: 12px; background: var(--kuning-muda); font-size: 15px; }
+.penjelasan-ulang li { margin: 3px 0; }
+.rincian[open] { padding-bottom: 18px; }
+.tonton-ulang .video + .video { margin-top: 28px; padding-top: 22px; border-top: 1px solid var(--garis); }
