@@ -135,3 +135,6 @@ textarea { resize: vertical; }
 .cara li b { color: var(--navy-tua); }
 .dibuat { margin: 32px 0 0; font-size: 14px; color: var(--teks-pudar); text-align: center; }
 .dibuat a { color: var(--navy); font-weight: 700; }
+.bilah-dev { position: fixed; top: 8px; right: 8px; z-index: 9; display: flex; flex-wrap: wrap; gap: 4px; align-items: center; max-width: 340px; padding: 8px; border-radius: 12px; background: #2b2b2b; color: #fff; font-size: 13px; box-shadow: var(--bayang); }
+.bilah-dev button, .bilah-dev select { min-height: 28px; width: auto; padding: 2px 8px; border: 0; border-radius: 6px; background: #444; color: #fff; font: inherit; cursor: pointer; }
+.bilah-dev button:hover { background: var(--navy); }

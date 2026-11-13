@@ -37,7 +37,7 @@ node dev-server.mjs "C:/Users/Luthfi Perdana/Desktop/h5p-player" 8093
 node dev-server.mjs "C:/Users/Luthfi Perdana/Desktop/uji-nyalain/public" 5500
 ```
 
-Buka `http://localhost:5500/uji/ut-tp` (cuma tampilan, tanpa API).
+Buka `http://localhost:5500/uji/ut-tp` (cuma tampilan, tanpa API). Di sini muncul **bilah Mode dev** (pojok kanan atas): loncat ke langkah mana aja tanpa nonton habis/ngisi semua, reset, ganti form. Bilah ini cuma ada di localhost:5500.
 
 Worker + API: `npx wrangler@4 d1 execute uji-ut --local --file skema.sql` sekali, lalu `npx wrangler@4 dev --local --port 5501`.
 Mode `--local` nggak nyentuh akun mana pun. Video nggak muncul di sini karena CSP cuma ngizinin h5p.wello.web.id. Pemutar lokal cuma mau ngobrol (postMessage) sama induk di localhost

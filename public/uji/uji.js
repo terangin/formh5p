@@ -432,6 +432,23 @@ function isiCatatan() {
   };
 }
 
+// ---------- mode dev (cuma localhost:5500, nggak pernah ada di situs asli) ----------
+// Loncat ke langkah mana aja tanpa syarat (nggak perlu nonton habis / ngisi semua), plus reset.
+function pasangBilahDev() {
+  const bilah = el('div', { className: 'bilah-dev' }, el('b', { textContent: 'Mode dev' }));
+  for (const l of [...LANGKAH, 'selesai']) {
+    const t = el('button', { type: 'button', textContent: l });
+    t.onclick = () => ke(l);
+    bilah.append(t);
+  }
+  const reset = el('button', { type: 'button', textContent: 'reset' });
+  reset.onclick = () => { localStorage.removeItem(KUNCI); location.reload(); };
+  const ganti = el('select', { ariaLabel: 'Ganti form' }, ...Object.keys(FORM).map((k) => el('option', { value: k, textContent: k, selected: k === kode })));
+  ganti.onchange = () => { location.href = `/uji/${ganti.value}`; };
+  bilah.append(reset, ganti);
+  document.body.append(bilah);
+}
+
 // ---------- mulai ----------
 if (!form) {
   $('galat-form').textContent = 'Alamat formulir ini tidak lengkap. Minta link yang benar ke dosen atau peneliti.';
@@ -444,5 +461,6 @@ if (!form) {
   $('langkah').append(...NAMA_LANGKAH.map((t) => el('li', {}, el('span', { textContent: t }))));
   isiPersetujuan(); isiIdentitas(); isiVideo(); isiAngket(); isiCatatan();
   $('versi-coba').hidden = !LOKAL;
+  if (LOKAL) pasangBilahDev();
   ke(s.selesai ? 'selesai' : s.langkah);
 }
