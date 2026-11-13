@@ -6,7 +6,7 @@ const PEMUTAR = location.hostname === 'localhost' ? 'http://localhost:8093' : 'h
 const FORM = {
   'ut-tp': {
     matkul: 'Produksi Bahan Pembelajaran Berbasis Online (SPTP4401)', prodi: 'Teknologi Pendidikan', periksa: 'Check', majuDikunci: true,
-    video: [{ isi: 'tp1-8a082ca8', judul: 'Video 1', detik: 398 }, { isi: 'tp2-3a0b90ab', judul: 'Video 2', detik: 464 }],
+    video: [{ isi: 'tp1-8a082ca8', judul: 'Video Bagian 1', detik: 398 }, { isi: 'tp2-3a0b90ab', judul: 'Video Bagian 2', detik: 464 }],
   },
   'ut-bindo-1': {
     matkul: 'Bahasa Indonesia', prodi: 'Pendidikan Bahasa dan Sastra Indonesia', periksa: 'Periksa', majuDikunci: true,
@@ -18,7 +18,7 @@ const FORM = {
   },
   'ut-pai': {
     matkul: 'Pendidikan Agama Islam', prodi: 'Pendidikan Agama Islam (PAI)', periksa: 'Check', majuDikunci: false, tombolLompat: true,
-    video: [{ isi: 'lumi-59763deb', judul: '[judul video belum dikasih]', detik: 927 }],
+    video: [{ isi: 'lumi-59763deb', judul: 'Video Pembelajaran Pendidikan Agama Islam', detik: 927 }],
   },
 };
 
@@ -324,6 +324,7 @@ const tunggu = new Map(); // id minta-waktu -> fungsi
 function blokVideo(v, ulang) {
   const iframe = el('iframe', { src: `${PEMUTAR}/tonton?isi=${v.isi}`, title: `Pemutar ${v.judul}`, allow: 'fullscreen', loading: 'eager' });
   iframe.dataset.isi = v.isi;
+  if (ulang) iframe.dataset.ulang = '1';
   const status = ulang ? '' : el('span', { className: 'status-video', id: `status-${v.isi}` });
   const urut = form.video.length > 1 ? el('span', { className: 'urut', textContent: `Video ${form.video.indexOf(v) + 1} dari ${form.video.length}` }) : '';
   const tandai = el('button', { type: 'button', className: 'tombol-dua', textContent: 'Tandai menit ini' });
@@ -336,7 +337,7 @@ function blokVideo(v, ulang) {
     gambarTandaVideo(v.isi);
     gambarTanda();
     // langsung nulis selagi ingat
-    (ulang ? $('daftar-tanda') : $(`tanda-${v.isi}`))?.querySelector(`[id="catatan-${t.dibuat}"]`)?.focus();
+    (ulang ? $('daftar-tanda') : $(`tanda-${v.isi}`))?.querySelector(`[data-dibuat="${t.dibuat}"]`)?.focus();
   };
   return el('div', { className: 'video' }, el('div', { className: 'video-kepala' }, el('div', {}, urut, el('h3', { textContent: v.judul })), status), iframe,
     el('div', { className: 'video-bawah' }, el('span', { className: 'kecil', textContent: 'Ada bagian yang keliru atau membingungkan? Tekan saat bagian itu muncul, lalu tulis catatannya (jeda videonya dulu kalau perlu).' }), tandai),
@@ -352,16 +353,31 @@ function pasangVideo() {
     gambarTandaVideo(v.isi);
   }
   perbaruiStatus();
-  // Catat posisi tiap 5 detik selama halaman kelihatan: dari sini ketahuan bagian yang diulang/dilewati.
+}
+
+// Data nonton pertama di s.video[isi]; tonton ulang (langkah Catatan) dipisah di s.video[isi].ulang
+// biar jejak dan jawaban kuisnya nggak kecampur.
+const catatanVideo = (f) => {
+  const v = s.video[f.dataset.isi];
+  return f.dataset.ulang ? (v.ulang ??= { xapi: [], posisi: [], selesai: 0, gagal: null }) : v;
+};
+
+// Catat posisi tiap 5 detik, cuma pemutar yang kelihatan: dari sini ketahuan bagian yang diulang/dilewati.
+let sedangSampel = false;
+function mulaiJamPosisi() {
   jamPosisi = setInterval(async () => {
-    if (document.hidden || !['video', 'catatan'].includes(s.langkah)) return;
-    for (const f of semuaPemutar()) {
-      const isi = f.dataset.isi;
-      const d = await mintaWaktu(f.contentWindow);
-      const p = s.video[isi].posisi;
-      if (d != null && (!p.length || Math.abs(p[p.length - 1][1] - d) > 0.5)) p.push([Date.now() - Date.parse(s.mulai), Math.round(d * 10) / 10]);
-    }
-    simpan();
+    if (document.hidden || sedangSampel) return;
+    const kelihatan = semuaPemutar().filter((f) => f.offsetParent !== null);
+    if (!kelihatan.length) return;
+    sedangSampel = true;
+    try {
+      const hasil = await Promise.all(kelihatan.map((f) => mintaWaktu(f.contentWindow)));
+      kelihatan.forEach((f, i) => {
+        const d = hasil[i], p = catatanVideo(f).posisi;
+        if (d != null && (!p.length || Math.abs(p[p.length - 1][1] - d) > 0.5)) p.push([Date.now() - Date.parse(s.mulai), Math.round(d * 10) / 10]);
+      });
+      simpan();
+    } finally { sedangSampel = false; }
   }, 5000);
 }
 
@@ -376,14 +392,13 @@ function mintaWaktu(w) {
 
 addEventListener('message', (e) => {
   if (e.origin !== PEMUTAR || e.data?.sumber !== 'wello-h5p') return;
-  const isi = semuaPemutar().find((f) => f.contentWindow === e.source)?.dataset.isi;
-  if (!isi) return;
-  const d = e.data, v = s.video[isi];
+  const f = semuaPemutar().find((x) => x.contentWindow === e.source);
+  if (!f) return;
+  const d = e.data, v = catatanVideo(f);
   const ts = Date.now() - Date.parse(s.mulai);
   if (d.jenis === 'waktu') { tunggu.get(d.id)?.(d.detik); tunggu.delete(d.id); return; }
   if (d.jenis === 'tinggi') {
-    const f = [...document.querySelectorAll('.video iframe')].find((x) => x.contentWindow === e.source);
-    if (f && d.px > 150) f.style.height = `${Math.min(d.px, 1400)}px`;
+    if (d.px > 150) f.style.height = `${Math.min(d.px, 1400)}px`;
     return;
   }
   if (d.jenis === 'siap') v.durasi = d.durasi;
@@ -471,7 +486,8 @@ function hitungButir() {
 const judulVideo = (isi) => form.video.find((v) => v.isi === isi)?.judul || isi;
 // Satu baris tanda: menit + kotak catatan + hapus. Dipakai di bawah video (waktu nonton) dan di langkah Catatan (cek ulang).
 function barisTanda(t, gambarUlang, tampilAsal) {
-  const catatan = el('input', { id: `catatan-${t.dibuat}`, value: t.catatan, placeholder: 'Apa yang keliru atau membingungkan?', ariaLabel: `Catatan untuk menit ${mmdd(t.detik)}` });
+  const catatan = el('input', { value: t.catatan, placeholder: 'Apa yang keliru atau membingungkan?', ariaLabel: `Catatan untuk menit ${mmdd(t.detik)}` });
+  catatan.dataset.dibuat = t.dibuat;
   catatan.oninput = () => { t.catatan = catatan.value; simpan(); };
   const hapus = el('button', { type: 'button', className: 'tombol-teks', textContent: 'Hapus' });
   hapus.onclick = () => { s.tanda.splice(s.tanda.indexOf(t), 1); simpan(); gambarUlang(); };
@@ -490,8 +506,10 @@ function gambarTanda() {
 function isiCatatan() {
   // Tonton ulang: pemutar baru dimuat waktu kotaknya dibuka, biar nggak ngunduh video kalau nggak perlu.
   $('tonton-ulang').addEventListener('toggle', () => {
-    if (!$('tonton-ulang').open || $('video-ulang').childElementCount) return;
-    s.tontonUlang = new Date().toISOString();
+    // Ditutup = pemutar dibuang (pemutar nggak punya perintah jeda dari luar, jadi ini satu-satunya cara berhentiin).
+    if (!$('tonton-ulang').open) return $('video-ulang').replaceChildren();
+    if ($('video-ulang').childElementCount) return;
+    s.tontonUlang ??= new Date().toISOString();
     simpan();
     $('video-ulang').append(...form.video.map((v) => blokVideo(v, true)));
   });
@@ -517,6 +535,7 @@ function isiCatatan() {
     simpan();
     if (await keServer()) {
       clearInterval(jamPosisi);
+      for (const f of semuaPemutar()) f.remove(); // berhentiin video yang mungkin masih jalan
       return ke('selesai');
     }
     s.selesai = null; // belum sampai server: jangan dikunci, biar bisa dicoba lagi
@@ -555,6 +574,7 @@ if (!form) {
   $('sub-form').textContent = form.video.length > 1 ? `${form.video.length} video, satu angket` : form.video[0].judul;
   $('langkah').append(...NAMA_LANGKAH.map((t) => el('li', {}, el('span', { textContent: t }))));
   isiPersetujuan(); isiIdentitas(); isiVideo(); isiAngket(); isiCatatan();
+  if (!s.selesai) mulaiJamPosisi();
   $('versi-coba').hidden = !LOKAL;
   if (LOKAL) pasangBilahDev();
   ke(s.selesai ? 'selesai' : s.langkah);
