@@ -8,7 +8,7 @@ riwayat lengkap ada di `Desktop\h5p-player\CLAUDE.md` bagian "Kuesioner uji coba
 
 | Apa | Di mana |
 |---|---|
-| Kode form | folder ini = repo GitHub `terangin/formh5p`. Halaman `public/uji/`, Worker `src/worker.js` (API simpan), validasi `src/simpan.js` + `test/`. Deploy = push `main` lewat Workers Builds (Worker `formh5p` di akun Terangin, TAYANG 2026-11-13 malam setelah 2 build gagal kode 10013 waktu Workers degraded; preview builds mati) |
+| Kode form | folder ini = repo GitHub `terangin/formh5p`. Halaman `public/uji/`, Worker `src/worker.js` (API simpan), validasi `src/simpan.js` + `test/`. Deploy = push `main` lewat Workers Builds (Worker `formh5p` di akun Terangin, TAYANG 2026-11-13 malam setelah 2 build gagal kode 10013 waktu Workers degraded; preview builds mati). 13 Nov malam push ke main NGGAK mancing build (insiden Cloudflare "Workers changes not producing events"): picu manual di Builds → ⋯ → Retry build (ngambil HEAD main); kadang gagal 10013, ulang aja |
 | Skema database | `skema.sql` (udah dijalanin di D1) |
 | Database jawaban | Cloudflare D1 `uji-ut`, akun **Terangin** (tengahrambu@gmail.com, akun `f6fc9a7d05c10b4d6725ba37e5fa86da`), Asia Pacific, id `6e1df5c7-c3c2-4d1a-90f9-b74645a2cfbb`. Tabel: `jawaban`, `peneliti`, `kode_masuk`, `sesi` |
 | Alamat form | `nyalain.kitaterangin.id/uji/<kode form>` (route Worker `nyalain.kitaterangin.id/uji*`; sisa domain tetap ke PocketBase rumah) |
