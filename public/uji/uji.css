@@ -128,3 +128,8 @@ textarea { resize: vertical; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
 .turnstile { margin-top: 16px; min-height: 65px; }
 .turnstile:empty { min-height: 0; }
+.cara { margin: 0 0 18px; padding: 16px 18px; border-radius: 14px; background: var(--navy-muda); }
+.cara h3 { margin: 0 0 8px; }
+.cara ol { margin: 0; padding-left: 22px; }
+.cara li { margin: 6px 0; }
+.cara li b { color: var(--navy-tua); }

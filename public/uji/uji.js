@@ -5,19 +5,19 @@ const PEMUTAR = location.hostname === 'localhost' ? 'http://localhost:8093' : 'h
 
 const FORM = {
   'ut-tp': {
-    matkul: 'Produksi Bahan Pembelajaran Berbasis Online (SPTP4401)', prodi: 'Teknologi Pendidikan',
+    matkul: 'Produksi Bahan Pembelajaran Berbasis Online (SPTP4401)', prodi: 'Teknologi Pendidikan', periksa: 'Check', majuDikunci: true,
     video: [{ isi: 'tp1-8a082ca8', judul: 'Video 1' }, { isi: 'tp2-3a0b90ab', judul: 'Video 2' }],
   },
   'ut-bindo-1': {
-    matkul: 'Bahasa Indonesia', prodi: 'Pendidikan Bahasa Indonesia',
+    matkul: 'Bahasa Indonesia', prodi: 'Pendidikan Bahasa Indonesia', periksa: 'Periksa', majuDikunci: true,
     video: [{ isi: 'bi1-67b38ac4', judul: 'Ketika Perbedaan Menjadi Solusi' }],
   },
   'ut-bindo-2': {
-    matkul: 'Bahasa Indonesia', prodi: 'Pendidikan Bahasa Indonesia',
+    matkul: 'Bahasa Indonesia', prodi: 'Pendidikan Bahasa Indonesia', periksa: 'Periksa', majuDikunci: true,
     video: [{ isi: 'bi2-f51501ab', judul: 'Batik Bercerita: Sebuah Wawancara tentang Warisan Indonesia' }],
   },
   'ut-arab': {
-    matkul: 'Bahasa Arab', prodi: '',
+    matkul: 'Bahasa Arab', prodi: '', periksa: 'Check', majuDikunci: false, tombolLompat: true,
     video: [{ isi: 'lumi-59763deb', judul: '[judul video belum dikasih]' }],
   },
 };
@@ -315,7 +315,23 @@ function perbaruiStatus() {
   if (semuaSelesai()) $('galat-video').hidden = true;
 }
 
+function isiCara() {
+  const b = (t) => el('b', { textContent: t });
+  const li = (...isi) => el('li', {}, ...isi);
+  $('cara-video').replaceChildren(
+    li('Tekan tombol putar di tengah video. Untuk layar penuh, tekan ikon kotak di pojok kanan bawah video.'),
+    li('Di beberapa bagian, video berhenti sendiri dan muncul soal. Mohon jawab soalnya, tekan ', b(form.periksa), ', lalu tekan tombol putar untuk melanjutkan.'),
+    li('Nilai soal di dalam video tidak dipakai untuk nilai mata kuliah. Jawaban Anda dicatat untuk menilai videonya, bukan menilai Anda.'),
+    form.majuDikunci
+      ? li('Video tidak bisa dilompati ke depan. Anda tetap bisa mundur untuk mengulang bagian tertentu, dan bisa menjeda kapan saja.')
+      : li('Video bisa dijeda, dimundurkan, atau dimajukan kapan saja.'),
+    ...(form.tombolLompat ? [li('Ada tombol dan kotak teks di dalam video. Tekan untuk melompat ke bagian tertentu atau membaca penjelasan.')] : []),
+    li(form.video.length > 1 ? 'Kedua video harus ditonton sampai selesai sebelum lanjut ke angket.' : 'Video harus ditonton sampai selesai sebelum lanjut ke angket.'),
+  );
+}
+
 function isiVideo() {
+  isiCara();
   $('lanjut-video').onclick = () => {
     if (semuaSelesai() || s.lewatiVideo) return ke('angket');
     $('galat-video').textContent = form.video.length > 1 ? 'Tonton kedua video sampai habis dulu.' : 'Tonton video sampai habis dulu.';

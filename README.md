@@ -8,10 +8,11 @@ riwayat lengkap ada di `Desktop\h5p-player\CLAUDE.md` bagian "Kuesioner uji coba
 
 | Apa | Di mana |
 |---|---|
-| Kode form | folder ini = repo GitHub `terangin/formh5p`. Halaman `public/uji/`, Worker `src/worker.js` (API simpan), validasi `src/simpan.js` + `test/`. Deploy = push `main` lewat Workers Builds (belum disambung) |
+| Kode form | folder ini = repo GitHub `terangin/formh5p`. Halaman `public/uji/`, Worker `src/worker.js` (API simpan), validasi `src/simpan.js` + `test/`. Deploy = push `main` lewat Workers Builds (Worker `formh5p` di akun Terangin, TAYANG 2026-11-13 malam setelah 2 build gagal kode 10013 waktu Workers degraded; preview builds mati) |
 | Skema database | `skema.sql` (udah dijalanin di D1) |
 | Database jawaban | Cloudflare D1 `uji-ut`, akun **Terangin** (tengahrambu@gmail.com, akun `f6fc9a7d05c10b4d6725ba37e5fa86da`), Asia Pacific, id `6e1df5c7-c3c2-4d1a-90f9-b74645a2cfbb`. Tabel: `jawaban`, `peneliti`, `kode_masuk`, `sesi` |
-| Alamat form (rencana) | `nyalain.kitaterangin.id/uji/<kode form>` lewat Worker (belum dibikin) |
+| Alamat form | `nyalain.kitaterangin.id/uji/<kode form>` (route Worker `nyalain.kitaterangin.id/uji*`; sisa domain tetap ke PocketBase rumah) |
+| Turnstile | widget "Form uji coba UT (formh5p)" akun Terangin, hostname `nyalain.kitaterangin.id`, mode Managed, sitekey `0x4AAAAAAF_sduyu4pBaXMQZ`. Secret = secret Worker `TURNSTILE_SECRET` (diisi user sendiri). Dicek di langkah persetujuan (action `mulai-uji`), cuma waktu bikin baris baru |
 | Kode form | `ut-tp` (TP, video tp1 + tp2, satu angket), `ut-bindo-1`, `ut-bindo-2` (Bahasa Indonesia, per materi), `ut-arab` (Bahasa Arab, video Lumi) |
 | Pemutar video | `https://h5p.wello.web.id/tonton?isi=<kode isi>`, repo `Desktop\h5p-player` → GitHub `buddywello-tech/h5p` → Cloudflare Pages `h5p`, akun **Wello** (buddy.wello@gmail.com, akun `c43749ed6a406f5ad6d213d55ec2fdad`). Push `main` = tayang |
 | Isi video (h5p.json + content/) | R2 bucket `h5p-isi`, akun **Wello**, publik mati, dibaca lewat binding `ISI` di Pages `h5p` (Production) oleh `functions/isi-host/[[path]].js` |
@@ -44,6 +45,6 @@ port 5500/5501/8090 (lihat `INDUK` di `tonton.js`). Data versi coba cuma di loca
 
 ## Belum
 
-Sambungin repo ke Workers Builds di akun Terangin (wrangler di laptop ini login ke akun lain, jangan dipakai buat deploy), halaman laporan peneliti (grafik ala Google Forms + CSV), email peneliti, isi placeholder
+Secret `TURNSTILE_SECRET` (user, setelah rotate karena secret lama sempat kebaca alat Claude), tes Turnstile asli + replay ditolak, halaman laporan peneliti (grafik ala Google Forms + CSV), email peneliti, isi placeholder
 (tanggal hapus data, kontak peneliti, judul video Arab, kalimat promosi), event `selesai` belum dites,
 tampilan HP belum dicek.
