@@ -3,10 +3,12 @@
 //   POST /uji/api/simpan    -> simpan/ubah jawaban ke D1 (dikunci setelah "selesai")
 //   GET  /uji/*             -> aset statis
 import { periksa, FORM_SAH } from './simpan.js';
+import { cekTurnstile } from './turnstile.js';
 
 const PEMUTAR = 'https://h5p.wello.web.id';
+const TS = 'https://challenges.cloudflare.com';
 const HEADER = {
-  'content-security-policy': `default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; frame-src ${PEMUTAR}; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'; object-src 'none'`,
+  'content-security-policy': `default-src 'self'; script-src 'self' ${TS}; style-src 'self'; img-src 'self' data:; frame-src ${PEMUTAR} ${TS}; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'; object-src 'none'`,
   'strict-transport-security': 'max-age=31536000',
   'x-content-type-options': 'nosniff',
   'referrer-policy': 'no-referrer',
@@ -29,6 +31,12 @@ async function simpan(req, env) {
   const hasil = periksa(await req.text());
   if (!hasil.ok) { catat('simpan-ditolak', { alasan: hasil.galat }); return json({ ok: false, galat: hasil.galat }, 400); }
   const b = hasil.baris;
+  // Baris baru cuma boleh dibikin setelah lolos Turnstile. Ubahan berikutnya cukup pakai id (UUID acak dari browser).
+  const ada = await env.DB.prepare('SELECT 1 FROM jawaban WHERE id = ?1').bind(b.id).first();
+  if (!ada) {
+    const t = await cekTurnstile(req.headers.get('cf-turnstile-response'), env, req.headers.get('cf-connecting-ip'), 'mulai-uji');
+    if (!t.ok) { catat('simpan-ditolak', { alasan: `turnstile:${t.alasan}`, form: b.form }); return json({ ok: false, galat: 'turnstile' }, 403); }
+  }
   // Baris yang udah "selesai" atau milik form lain nggak bisa ditimpa.
   const r = await env.DB.prepare(
     `INSERT INTO jawaban (id, form, mulai, diubah, selesai, data) VALUES (?1, ?2, ?3, ?4, ?5, ?6)

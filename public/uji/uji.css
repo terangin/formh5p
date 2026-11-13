@@ -126,3 +126,5 @@ textarea { resize: vertical; }
   .daftar-tanda li { grid-template-columns: auto 1fr; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+.turnstile { margin-top: 16px; min-height: 65px; }
+.turnstile:empty { min-height: 0; }

@@ -94,24 +94,44 @@ function muat() {
     perangkat: perangkat(), selesai: null,
   };
 }
-// Tiap perubahan masuk localStorage dulu (aman kalau internet putus), lalu dikirim ke server
-// paling sering tiap 3 detik. Sebelum ada persetujuan nggak ada yang dikirim.
+// Tiap perubahan masuk localStorage dulu (aman kalau internet putus). Baris di server dibikin sekali
+// waktu persetujuan, dijaga Turnstile (daftar). Setelah itu perubahan dikirim paling sering tiap 3 detik.
 const LOKAL = location.hostname === 'localhost' && location.port === '5500'; // dev-server.mjs, tanpa API
+// Sitekey publik widget "Form uji coba UT (formh5p)" (akun Terangin). Di wrangler dev pakai kunci tes Cloudflare yang selalu lolos.
+const SITEKEY = location.hostname === 'nyalain.kitaterangin.id' ? '0x4AAAAAAF_sduyu4pBaXMQZ' : '1x00000000000000000000AA';
 let jamKirim;
 const simpan = () => {
   s.diubah = new Date().toISOString();
   localStorage.setItem(KUNCI, JSON.stringify(s));
-  if (s.persetujuan && !s.selesai) { clearTimeout(jamKirim); jamKirim = setTimeout(keServer, 3000); }
+  if (s.terdaftar && !s.selesai) { clearTimeout(jamKirim); jamKirim = setTimeout(keServer, 3000); }
 };
-async function keServer() {
+async function keServer(token) {
   clearTimeout(jamKirim);
   if (LOKAL) return true;
   try {
-    const r = await fetch('/uji/api/simpan', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(s), keepalive: true });
+    const headers = { 'content-type': 'application/json' };
+    if (token) headers['cf-turnstile-response'] = token;
+    const r = await fetch('/uji/api/simpan', { method: 'POST', headers, body: JSON.stringify(s), keepalive: true });
     return r.ok || r.status === 409; // 409 = udah terkunci karena pernah terkirim lengkap
   } catch { return false; }
 }
-addEventListener('pagehide', () => { if (s?.persetujuan && !s.selesai) keServer(); });
+addEventListener('pagehide', () => { if (s?.terdaftar && !s.selesai) keServer(); });
+
+// Turnstile cuma di langkah persetujuan. Token sekali pakai: gagal = reset widget, minta token baru.
+let tokenTurnstile = null, idWidget;
+function pasangTurnstile(siap) {
+  if (s.terdaftar || LOKAL) return;
+  const skrip = el('script', { src: 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit', async: true });
+  skrip.onload = () => {
+    idWidget = window.turnstile.render('#turnstile', {
+      sitekey: SITEKEY, action: 'mulai-uji', language: 'id',
+      callback: (t) => { tokenTurnstile = t; siap(); },
+      'expired-callback': () => { tokenTurnstile = null; siap(); },
+      'error-callback': () => { tokenTurnstile = null; siap(); },
+    });
+  };
+  document.head.append(skrip);
+}
 
 function ke(langkah) {
   s.langkah = langkah;
@@ -153,14 +173,33 @@ function isiPersetujuan() {
     <h3>Pertanyaan</h3>
     <p>Hubungi peneliti: [nama dan kontak peneliti belum dikasih].</p>`;
   $('teks-persetujuan').querySelector('b').textContent = form.matkul;
+  const tombol = $('lanjut-persetujuan');
+  const atur = () => { tombol.disabled = !s.persetujuan || !(s.terdaftar || LOKAL || tokenTurnstile); };
   $('setuju').checked = !!s.persetujuan;
-  $('lanjut-persetujuan').disabled = !s.persetujuan;
   $('setuju').onchange = (e) => {
     s.persetujuan = e.target.checked ? new Date().toISOString() : null;
-    $('lanjut-persetujuan').disabled = !e.target.checked;
+    atur();
     simpan();
   };
-  $('lanjut-persetujuan').onclick = () => ke('identitas');
+  pasangTurnstile(atur);
+  atur();
+  tombol.onclick = async () => {
+    if (s.terdaftar || LOKAL) return ke('identitas');
+    tombol.disabled = true;
+    tombol.textContent = 'Memeriksa...';
+    const ok = await keServer(tokenTurnstile);
+    tokenTurnstile = null;
+    tombol.textContent = 'Lanjut';
+    if (ok) {
+      s.terdaftar = new Date().toISOString();
+      $('galat-persetujuan').hidden = true;
+      $('turnstile').hidden = true;
+      return ke('identitas');
+    }
+    $('galat-persetujuan').hidden = false;
+    window.turnstile?.reset(idWidget);
+    atur();
+  };
   $('tolak').onclick = () => { localStorage.removeItem(KUNCI); for (const sec of document.querySelectorAll('[data-langkah]')) sec.hidden = sec.dataset.langkah !== 'tolak'; };
 }
 
