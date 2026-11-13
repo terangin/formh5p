@@ -49,15 +49,13 @@
       <label>NIM <input name="nim" required inputmode="numeric" autocomplete="off"></label>
       <label>Email <input name="email" type="email" required autocomplete="email" inputmode="email"></label>
       <label>Program studi
-        <select name="prodi" required>
-          <option value="">Pilih</option>
-        </select>
+        <input name="prodi" list="daftar-prodi" required autocomplete="off" placeholder="Ketik untuk mencari, misalnya: Teknologi">
+        <datalist id="daftar-prodi"></datalist>
       </label>
       <label>Semester <input name="semester" required inputmode="numeric" maxlength="2"></label>
       <label>UPBJJ
-        <select name="upbjj" required>
-          <option value="">Pilih</option>
-        </select>
+        <input name="upbjj" list="daftar-upbjj" required autocomplete="off" placeholder="Ketik untuk mencari, misalnya: Jakarta">
+        <datalist id="daftar-upbjj"></datalist>
       </label>
       <label>Pekerjaan <input name="pekerjaan" required></label>
       <label>Perangkat yang digunakan

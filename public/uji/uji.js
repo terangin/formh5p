@@ -223,8 +223,17 @@ function isiPersetujuan() {
 // ---------- identitas ----------
 function isiIdentitas() {
   const f = $('form-identitas');
-  f.elements.prodi.append(...PRODI.map(([fak, daftar]) => el('optgroup', { label: fak }, ...daftar.map((p) => el('option', { textContent: p })))));
-  f.elements.upbjj.append(...UPBJJ.map((u) => el('option', { textContent: u })));
+  // Kotak ketik + saran (datalist). Isian tetap harus sama dengan salah satu pilihan resmi (dicek waktu Lanjut).
+  $('daftar-prodi').append(...PRODI.flatMap(([fak, daftar]) => daftar.map((p) => el('option', { value: p, label: fak }))));
+  $('daftar-upbjj').append(...UPBJJ.map((u) => el('option', { value: u })));
+  const resmi = { prodi: PRODI.flatMap(([, d]) => d), upbjj: UPBJJ };
+  // Ketikan yang cuma beda huruf besar/kecil dirapikan ke nama resmi.
+  for (const n of Object.keys(resmi)) {
+    f.elements[n].addEventListener('change', (e) => {
+      const cocok = resmi[n].find((x) => x.toLowerCase() === e.target.value.trim().toLowerCase());
+      if (cocok && cocok !== e.target.value) { e.target.value = cocok; s.identitas[n] = cocok; simpan(); }
+    });
+  }
   if (!s.identitas.tanggal) s.identitas.tanggal = new Date().toLocaleDateString('sv-SE');
   if (!s.identitas.prodi && form.prodi) s.identitas.prodi = form.prodi;
   for (const [k, v] of Object.entries(s.identitas)) {
@@ -252,6 +261,8 @@ function isiIdentitas() {
     // Format yang dicek selain wajib isi. Pesan pertama yang kena dipakai.
     const FORMAT = {
       nim: [/^\d{6,12}$/, 'NIM diisi angka saja.'],
+      prodi: [{ test: (v) => resmi.prodi.includes(v) }, 'Program studi harus dipilih dari daftar yang muncul saat mengetik.'],
+      upbjj: [{ test: (v) => resmi.upbjj.includes(v) }, 'UPBJJ harus dipilih dari daftar yang muncul saat mengetik.'],
       email: [/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/, 'Alamat email belum benar.'],
       whatsapp: [/^(\+?62|0)8\d{7,12}$/, 'Nomor WhatsApp belum benar, contoh 081234567890.'],
     };
