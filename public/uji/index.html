@@ -47,6 +47,7 @@
     <form id="form-identitas" class="isian" novalidate>
       <label>Nama <input name="nama" required autocomplete="name"></label>
       <label>NIM <input name="nim" required inputmode="numeric" autocomplete="off"></label>
+      <label>Email <input name="email" type="email" required autocomplete="email" inputmode="email"></label>
       <label>Program studi
         <select name="prodi" required>
           <option value="">Pilih</option>
@@ -81,6 +82,8 @@
       </label>
       <label data-lainnya="perangkat" hidden>Perangkat lainnya <input name="perangkat_lain"></label>
       <label>Tanggal uji coba <input name="tanggal" type="date" required></label>
+      <label class="centang"><input type="checkbox" name="bersedia_wawancara"> Saya bersedia dihubungi untuk wawancara lanjutan</label>
+      <label id="kolom-wa" hidden>Nomor WhatsApp <input name="whatsapp" type="tel" inputmode="tel" autocomplete="tel" placeholder="08xxxxxxxxxx"></label>
       <p class="galat" id="galat-identitas" hidden></p>
       <div class="aksi"><button class="tombol">Lanjut</button></div>
     </form>

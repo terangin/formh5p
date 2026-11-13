@@ -163,12 +163,12 @@ function isiPersetujuan() {
     <p>Keikutsertaan Anda sukarela. Anda boleh berhenti kapan saja. Ikut atau tidak, jawaban Anda tidak memengaruhi nilai mata kuliah.</p>
     <h3>Data yang dicatat</h3>
     <ul>
-      <li>Isian Anda: identitas, jawaban angket, catatan, dan menit yang Anda tandai.</li>
+      <li>Isian Anda: identitas (termasuk email, dan nomor WhatsApp bila Anda bersedia diwawancara), jawaban angket, catatan, dan menit yang Anda tandai.</li>
       <li>Selama menonton: bagian video yang diputar, diulang, atau dilewati, dan jawaban kuis di dalam video.</li>
       <li>Perangkat: jenis browser, ukuran layar, zona waktu, dan perkiraan kecepatan internet.</li>
     </ul>
     <h3>Siapa yang melihat dan berapa lama disimpan</h3>
-    <p>Data hanya bisa dilihat tim peneliti. Hasil penelitian dilaporkan tanpa menyebut nama. Data disimpan di server Cloudflare dan dihapus setelah penelitian selesai, paling lambat [tanggal belum ditentukan].</p>
+    <p>Data hanya bisa dilihat tim peneliti. Email dan nomor WhatsApp hanya dipakai peneliti untuk menghubungi Anda terkait penelitian ini. Hasil penelitian dilaporkan tanpa menyebut nama. Data disimpan di server Cloudflare dan dihapus setelah penelitian selesai, paling lambat [tanggal belum ditentukan].</p>
     <p>Formulir ini disediakan Nyalain (dari Terangin). Nyalain tidak memakai data Anda untuk keperluan lain dan tidak mengirimi Anda promosi.</p>
     <h3>Pertanyaan</h3>
     <p>Hubungi peneliti: [nama dan kontak peneliti belum dikasih].</p>`;
@@ -208,30 +208,53 @@ function isiIdentitas() {
   const f = $('form-identitas');
   if (!s.identitas.tanggal) s.identitas.tanggal = new Date().toLocaleDateString('sv-SE');
   if (!s.identitas.prodi && form.prodi) s.identitas.prodi = form.prodi;
-  for (const [k, v] of Object.entries(s.identitas)) if (f.elements[k]) f.elements[k].value = v;
+  for (const [k, v] of Object.entries(s.identitas)) {
+    const x = f.elements[k];
+    if (x?.type === 'checkbox') x.checked = !!v; else if (x) x.value = v;
+  }
   const lainnya = () => {
     for (const lab of f.querySelectorAll('[data-lainnya]')) {
       lab.hidden = f.elements[lab.dataset.lainnya].value !== 'lainnya';
       lab.querySelector('input').required = !lab.hidden;
     }
+    // WhatsApp cuma diminta dari yang bersedia diwawancara.
+    $('kolom-wa').hidden = !f.elements.bersedia_wawancara.checked;
+    f.elements.whatsapp.required = f.elements.bersedia_wawancara.checked;
   };
   lainnya();
   f.oninput = (e) => {
-    s.identitas[e.target.name] = e.target.value.trim();
+    s.identitas[e.target.name] = e.target.type === 'checkbox' ? e.target.checked : e.target.value.trim();
     e.target.removeAttribute('aria-invalid');
     lainnya();
     simpan();
   };
   f.onsubmit = (e) => {
     e.preventDefault();
-    const salah = [...f.elements].filter((x) => x.name && (x.required && !x.value.trim() || x.name === 'nim' && x.value && !/^\d{6,12}$/.test(x.value.trim())));
+    // Format yang dicek selain wajib isi. Pesan pertama yang kena dipakai.
+    const FORMAT = {
+      nim: [/^\d{6,12}$/, 'NIM diisi angka saja.'],
+      email: [/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/, 'Alamat email belum benar.'],
+      whatsapp: [/^(\+?62|0)8\d{7,12}$/, 'Nomor WhatsApp belum benar, contoh 081234567890.'],
+    };
+    const bersih = (x) => (x.name === 'whatsapp' ? x.value.replace(/[\s-]/g, '') : x.value.trim());
+    const pesan = [];
+    const salah = [...f.elements].filter((x) => {
+      if (!x.name || x.type === 'checkbox' || x.closest('[hidden]')) return false;
+      if (x.required && !bersih(x)) return true;
+      const aturan = FORMAT[x.name];
+      if (aturan && bersih(x) && !aturan[0].test(bersih(x))) { pesan.push(aturan[1]); return true; }
+      return false;
+    });
     salah.forEach((x) => x.setAttribute('aria-invalid', 'true'));
     $('galat-identitas').hidden = !salah.length;
     if (salah.length) {
-      $('galat-identitas').textContent = salah.some((x) => x.name === 'nim' && x.value) ? 'NIM diisi angka saja. Cek juga kotak yang bergaris merah.' : 'Masih ada yang kosong, lihat kotak yang bergaris merah.';
+      $('galat-identitas').textContent = pesan[0] ? `${pesan[0]} Cek juga kotak yang bergaris merah.` : 'Masih ada yang kosong, lihat kotak yang bergaris merah.';
       salah[0].focus();
       return;
     }
+    // Nomor dari yang nggak bersedia diwawancara nggak disimpan.
+    if (f.elements.bersedia_wawancara.checked) s.identitas.whatsapp = bersih(f.elements.whatsapp);
+    else delete s.identitas.whatsapp;
     ke('video');
   };
 }
