@@ -530,11 +530,22 @@ function isiCatatan() {
     e.preventDefault();
     const m = e.target.elements.menit.value.match(/^(\d{1,3}):([0-5]\d)$/);
     if (!m) return e.target.elements.menit.setAttribute('aria-invalid', 'true');
-    s.tanda.push({ video: pilih.value, detik: +m[1] * 60 + +m[2], catatan: '', dibuat: new Date().toISOString(), dari: 'ketik' });
+    e.target.elements.menit.removeAttribute('aria-invalid');
+    const t = { video: pilih.value, detik: +m[1] * 60 + +m[2], catatan: '', dibuat: new Date().toISOString(), dari: 'ketik' };
+    s.tanda.push(t);
     e.target.reset();
     simpan();
     gambarTanda();
+    gambarTandaVideo(t.video);
+    $('daftar-tanda').querySelector(`[data-dibuat="${t.dibuat}"]`)?.focus(); // langsung tulis catatannya
   };
+  // Form 1 video: kolom pilih video disembunyikan, jadi kalimatnya nggak nyuruh milih.
+  $('penjelasan-manual').replaceChildren(
+    'Masih ingat ada bagian yang keliru atau membingungkan tetapi belum ditandai? ',
+    form.video.length > 1 ? 'Pilih videonya, ketik menitnya' : 'Ketik menitnya',
+    ' dengan format menit:detik (contoh ', el('b', { textContent: '03:15' }), ' berarti menit ke-3 detik ke-15), lalu tekan ',
+    el('b', { textContent: 'Tambah' }), '. Kotak catatannya akan muncul di daftar di atas.',
+  );
   $('kirim').onclick = async () => {
     const tombol = $('kirim');
     tombol.disabled = true;

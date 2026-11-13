@@ -116,9 +116,11 @@
       <textarea id="catatan" rows="5"></textarea>
     </label>
     <h3>Bagian yang Anda tandai</h3>
-    <p class="kecil">Ini menit yang Anda tandai waktu menonton. Cek lagi catatannya, atau tambahkan yang terlewat.</p>
-    <p class="kecil" id="kosong-tanda">Belum ada yang ditandai.</p>
+    <p class="kecil">Berikut daftar menit yang Anda tandai dengan tombol <b>Tandai menit ini</b> saat menonton video pada langkah Tonton. Periksa kembali catatan pada setiap menit, atau tambahkan bagian yang terlewat melalui isian di bawah.</p>
+    <p class="kecil" id="kosong-tanda">Anda belum menandai menit mana pun.</p>
     <ol class="daftar-tanda" id="daftar-tanda"></ol>
+    <h4 class="judul-manual">Tambah tanda tanpa menonton ulang</h4>
+    <p class="kecil" id="penjelasan-manual">Masih ingat ada bagian yang keliru atau membingungkan tetapi belum ditandai? <span class="pilih">Pilih videonya, lalu </span>ketik menitnya dengan format menit:detik (contoh <b>03:15</b> berarti menit ke-3 detik ke-15), lalu tekan <b>Tambah</b>. Kotak catatannya akan muncul di daftar di atas.</p>
     <form class="tambah-tanda" id="form-tanda">
       <label>Video <select name="video" id="pilih-video-tanda"></select></label>
       <label>Menit (mm:dd) <input name="menit" placeholder="03:15" pattern="\d{1,3}:[0-5]\d" required></label>
