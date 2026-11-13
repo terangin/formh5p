@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Laporan Uji Coba Video Pembelajaran</title>
+<link rel="icon" href="/uji/ikon-nyalain.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/uji/uji.css">
+<link rel="stylesheet" href="/uji/laporan.css">
+<script type="module" src="/uji/laporan.js"></script>
+</head>
+<body>
+<main class="halaman lebar">
+  <header class="kepala">
+    <p class="label">Laporan peneliti · Uji coba video pembelajaran</p>
+    <h1 id="judul">Laporan</h1>
+    <p class="sub" id="sub"></p>
+  </header>
+  <p class="contoh" id="contoh" hidden>DATA CONTOH: bukan jawaban responden asli. Dibuat otomatis untuk melihat tampilan laporan.</p>
+  <nav class="tab-form" id="tab-form" aria-label="Pilih formulir"></nav>
+  <p class="galat" id="galat" hidden></p>
+
+  <div id="isi" hidden>
+    <section class="kartu-lap">
+      <div class="judul-lap"><h2>Ringkasan</h2>
+        <div class="unduh"><button type="button" class="tombol-dua" id="unduh-mentah">Unduh CSV data mentah</button>
+          <button type="button" class="tombol-dua" id="unduh-olahan">Unduh CSV data olahan</button></div></div>
+      <div class="ubin" id="ubin"></div>
+    </section>
+
+    <section class="kartu-lap">
+      <h2>Kelayakan per aspek</h2>
+      <p class="kecil">Persentase = jumlah skor ÷ skor maksimal × 100. Kategori: ≥81 sangat layak, 61–80 layak, 41–60 cukup layak, 21–40 kurang layak, ≤20 tidak layak.</p>
+      <div id="aspek"></div>
+      <details class="rincian"><summary>Tabel statistik aspek dan reliabilitas (Cronbach's alpha)</summary><div class="gulir" id="tabel-aspek"></div></details>
+    </section>
+
+    <section class="kartu-lap">
+      <h2>Sebaran jawaban per butir</h2>
+      <p class="kecil">Batang menunjukkan jumlah responden per pilihan. Rata-rata memakai skor; butir 4 pernyataan negatif sehingga skornya dibalik (1 jadi 5). Validitas: korelasi butir dengan total butir lain (terkoreksi) dibandingkan r tabel, α 0,05 dua arah.</p>
+      <div class="legenda" id="legenda"></div>
+      <div id="butir"></div>
+      <details class="rincian"><summary>Tabel statistik deskriptif dan validitas per butir</summary><div class="gulir" id="tabel-butir"></div></details>
+    </section>
+
+    <section class="kartu-lap">
+      <h2>Bagian video yang ditandai</h2>
+      <p class="kecil">Jumlah tanda dari responden per 30 detik video. Batang tertinggi = bagian yang paling sering dianggap keliru atau membingungkan.</p>
+      <div id="peta"></div>
+    </section>
+
+    <section class="kartu-lap">
+      <h2>Profil responden</h2>
+      <div class="grid-profil" id="profil"></div>
+    </section>
+
+    <section class="kartu-lap">
+      <h2>Catatan dan masukan umum</h2>
+      <ul class="daftar-catatan" id="catatan"></ul>
+    </section>
+
+    <section class="kartu-lap">
+      <h2>Daftar responden</h2>
+      <div class="gulir" id="responden"></div>
+    </section>
+  </div>
+</main>
+</body>
+</html>
