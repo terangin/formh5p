@@ -172,14 +172,15 @@ function ke(langkah) {
 function isiPersetujuan() {
   const nVideo = form.video.length > 1 ? `${form.video.length} video` : '1 video';
   // Perkiraan: lama video + sekitar 15 menit isi identitas dan angket, dibulatkan ke 5 menit.
-  const menit = Math.ceil((form.video.reduce((a, v) => a + v.detik, 0) / 60 + 15) / 5) * 5;
+  const menitVideo = Math.round(form.video.reduce((a, v) => a + v.detik, 0) / 60);
+  const menit = Math.ceil((menitVideo + 15) / 5) * 5;
   $('teks-persetujuan').innerHTML = `
     <p class="pengantar">Tim peneliti Fakultas Keguruan dan Ilmu Pendidikan (FKIP) Universitas Terbuka mengundang Anda berpartisipasi dalam uji coba video pembelajaran mata kuliah <b></b>. Uji coba ini bertujuan menemukan kesalahan, bagian yang membingungkan, dan kendala teknis sebelum video digunakan secara lebih luas.</p>
     <ul class="poin">
-      <li><b>Sekitar ${menit} menit</b><span>termasuk menonton ${nVideo}</span></li>
-      <li><b>Sukarela</b><span>Anda dapat berhenti kapan saja</span></li>
-      <li><b>Tidak memengaruhi nilai</b><span>tidak ada jawaban benar atau salah</span></li>
-      <li><b>Kerahasiaan terjaga</b><span>hasil dilaporkan tanpa menyebut nama</span></li>
+      <li><b>Perkiraan waktu sekitar ${menit} menit</b><span>Termasuk menonton ${nVideo} dengan total durasi sekitar ${menitVideo} menit, serta mengisi identitas, angket, dan catatan.</span></li>
+      <li><b>Partisipasi bersifat sukarela</b><span>Anda dapat berhenti atau mengundurkan diri kapan saja tanpa perlu memberikan alasan.</span></li>
+      <li><b>Tidak memengaruhi nilai akademik</b><span>Keikutsertaan maupun jawaban Anda tidak berpengaruh pada nilai mata kuliah. Tidak ada jawaban yang benar atau salah.</span></li>
+      <li><b>Kerahasiaan data terjaga</b><span>Data hanya digunakan oleh tim peneliti untuk penelitian ini, dan hasilnya dilaporkan tanpa menyebut nama Anda.</span></li>
     </ul>
     <h3>Prosedur</h3>
     <ol class="alur">

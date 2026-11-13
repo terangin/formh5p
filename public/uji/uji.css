@@ -144,7 +144,7 @@ textarea { resize: vertical; }
 .poin { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin: 0 0 4px; padding: 0; list-style: none; }
 .poin li { display: grid; gap: 2px; padding: 12px 14px; border-radius: 12px; background: var(--krim); border-left: 4px solid var(--kuning); }
 .poin b { color: var(--navy-tua); }
-.poin span { font-size: 14px; color: var(--teks-pudar); }
+.poin span { font-size: 15px; line-height: 1.45; color: var(--teks); }
 .alur { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 0; padding: 0; list-style: none; counter-reset: a; }
 .alur li { counter-increment: a; display: flex; gap: 8px; align-items: flex-start; padding: 10px; border-radius: 12px; background: var(--navy-muda); font-size: 15px; font-weight: 600; line-height: 1.35; }
 .alur li::before { content: counter(a); flex: none; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--navy); color: #fff; font-size: 13px; font-weight: 800; }
@@ -152,7 +152,7 @@ textarea { resize: vertical; }
 .rincian summary { min-height: 44px; display: flex; align-items: center; font-weight: 800; color: var(--navy); cursor: pointer; }
 .rincian h4 { margin: 10px 0 4px; color: var(--navy-tua); font-size: 15px; }
 .rincian p, .rincian ul { margin: 4px 0 10px; font-size: 15px; }
-@media (max-width: 600px) { .poin { grid-template-columns: 1fr 1fr; } .alur { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 600px) { .poin { grid-template-columns: 1fr; } .alur { grid-template-columns: 1fr 1fr; } }
 .teks-panjang .poin, .teks-panjang .alur { padding: 0; }
 .rincian summary { gap: 8px; list-style: none; }
 .rincian summary::-webkit-details-marker { display: none; }
@@ -165,3 +165,4 @@ textarea { resize: vertical; }
 .pernyataan li { margin: 4px 0; }
 .teks-panjang .pernyataan h3::before { display: none; }
 .teks-panjang .pernyataan h3 { padding-left: 0; }
+.poin li { align-content: start; }
