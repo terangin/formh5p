@@ -16,8 +16,8 @@ const FORM = {
     matkul: 'Bahasa Indonesia', prodi: 'Pendidikan Bahasa dan Sastra Indonesia', periksa: 'Periksa', majuDikunci: true,
     video: [{ isi: 'bi2-f51501ab', judul: 'Batik Bercerita: Sebuah Wawancara tentang Warisan Indonesia', detik: 452 }],
   },
-  'ut-arab': {
-    matkul: 'Bahasa Arab', prodi: '', periksa: 'Check', majuDikunci: false, tombolLompat: true,
+  'ut-pai': {
+    matkul: 'Pendidikan Agama Islam', prodi: 'Pendidikan Agama Islam (PAI)', periksa: 'Check', majuDikunci: false, tombolLompat: true,
     video: [{ isi: 'lumi-59763deb', judul: '[judul video belum dikasih]', detik: 927 }],
   },
 };

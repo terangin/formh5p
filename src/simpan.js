@@ -1,5 +1,5 @@
 // Validasi kiriman jawaban dari browser. Murni (tanpa D1) biar bisa dites di node.
-export const FORM_SAH = ['ut-tp', 'ut-bindo-1', 'ut-bindo-2', 'ut-arab'];
+export const FORM_SAH = ['ut-tp', 'ut-bindo-1', 'ut-bindo-2', 'ut-pai'];
 export const MAKS_BYTE = 512 * 1024; // jejak posisi video 15 menit + xAPI jauh di bawah ini
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
 const WAKTU = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$/;
