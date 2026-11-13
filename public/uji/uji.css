@@ -140,3 +140,21 @@ textarea { resize: vertical; }
 .bilah-dev button, .bilah-dev select { min-height: 28px; width: auto; padding: 2px 8px; border: 0; border-radius: 6px; background: #444; color: #fff; font: inherit; cursor: pointer; }
 .bilah-dev button:hover { background: var(--navy); }
 .isian label.centang { display: flex; margin-top: 4px; font-size: 16px; }
+.pengantar { margin: 14px 0 12px; }
+.poin { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin: 0 0 4px; padding: 0; list-style: none; }
+.poin li { display: grid; gap: 2px; padding: 12px 14px; border-radius: 12px; background: var(--krim); border-left: 4px solid var(--kuning); }
+.poin b { color: var(--navy-tua); }
+.poin span { font-size: 14px; color: var(--teks-pudar); }
+.alur { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 0; padding: 0; list-style: none; counter-reset: a; }
+.alur li { counter-increment: a; display: flex; gap: 8px; align-items: flex-start; padding: 10px; border-radius: 12px; background: var(--navy-muda); font-size: 15px; font-weight: 600; line-height: 1.35; }
+.alur li::before { content: counter(a); flex: none; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--navy); color: #fff; font-size: 13px; font-weight: 800; }
+.rincian { margin: 14px 0 8px; border: 1.5px solid var(--garis); border-radius: 12px; padding: 0 14px; }
+.rincian summary { min-height: 44px; display: flex; align-items: center; font-weight: 800; color: var(--navy); cursor: pointer; }
+.rincian h4 { margin: 10px 0 4px; color: var(--navy-tua); font-size: 15px; }
+.rincian p, .rincian ul { margin: 4px 0 10px; font-size: 15px; }
+@media (max-width: 600px) { .poin { grid-template-columns: 1fr 1fr; } .alur { grid-template-columns: 1fr 1fr; } }
+.teks-panjang .poin, .teks-panjang .alur { padding: 0; }
+.rincian summary { gap: 8px; list-style: none; }
+.rincian summary::-webkit-details-marker { display: none; }
+.rincian summary::before { content: "▸"; transition: transform .15s; }
+.rincian[open] summary::before { transform: rotate(90deg); }

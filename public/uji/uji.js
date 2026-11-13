@@ -6,19 +6,19 @@ const PEMUTAR = location.hostname === 'localhost' ? 'http://localhost:8093' : 'h
 const FORM = {
   'ut-tp': {
     matkul: 'Produksi Bahan Pembelajaran Berbasis Online (SPTP4401)', prodi: 'Teknologi Pendidikan', periksa: 'Check', majuDikunci: true,
-    video: [{ isi: 'tp1-8a082ca8', judul: 'Video 1' }, { isi: 'tp2-3a0b90ab', judul: 'Video 2' }],
+    video: [{ isi: 'tp1-8a082ca8', judul: 'Video 1', detik: 398 }, { isi: 'tp2-3a0b90ab', judul: 'Video 2', detik: 464 }],
   },
   'ut-bindo-1': {
     matkul: 'Bahasa Indonesia', prodi: 'Pendidikan Bahasa dan Sastra Indonesia', periksa: 'Periksa', majuDikunci: true,
-    video: [{ isi: 'bi1-67b38ac4', judul: 'Ketika Perbedaan Menjadi Solusi' }],
+    video: [{ isi: 'bi1-67b38ac4', judul: 'Ketika Perbedaan Menjadi Solusi', detik: 415 }],
   },
   'ut-bindo-2': {
     matkul: 'Bahasa Indonesia', prodi: 'Pendidikan Bahasa dan Sastra Indonesia', periksa: 'Periksa', majuDikunci: true,
-    video: [{ isi: 'bi2-f51501ab', judul: 'Batik Bercerita: Sebuah Wawancara tentang Warisan Indonesia' }],
+    video: [{ isi: 'bi2-f51501ab', judul: 'Batik Bercerita: Sebuah Wawancara tentang Warisan Indonesia', detik: 452 }],
   },
   'ut-arab': {
     matkul: 'Bahasa Arab', prodi: '', periksa: 'Check', majuDikunci: false, tombolLompat: true,
-    video: [{ isi: 'lumi-59763deb', judul: '[judul video belum dikasih]' }],
+    video: [{ isi: 'lumi-59763deb', judul: '[judul video belum dikasih]', detik: 927 }],
   },
 };
 
@@ -170,25 +170,38 @@ function ke(langkah) {
 
 // ---------- persetujuan ----------
 function isiPersetujuan() {
-  const menit = form.video.length > 1 ? `${form.video.length} video` : '1 video';
+  const nVideo = form.video.length > 1 ? `${form.video.length} video` : '1 video';
+  // Perkiraan: lama video + sekitar 15 menit isi identitas dan angket, dibulatkan ke 5 menit.
+  const menit = Math.ceil((form.video.reduce((a, v) => a + v.detik, 0) / 60 + 15) / 5) * 5;
   $('teks-persetujuan').innerHTML = `
-    <h3>Tujuan</h3>
-    <p>Tim peneliti Fakultas Keguruan dan Ilmu Pendidikan Universitas Terbuka sedang menguji video pembelajaran mata kuliah <b></b>. Uji coba ini mencari kesalahan, bagian yang membingungkan, dan kendala teknis sebelum video dipakai lebih luas.</p>
-    <h3>Yang Anda lakukan</h3>
-    <p>Mengisi identitas, menonton ${menit} sampai selesai, mengisi 25 pernyataan, dan menulis catatan bila ada. Anda mungkin dihubungi untuk wawancara lanjutan.</p>
-    <h3>Sukarela</h3>
-    <p>Keikutsertaan Anda sukarela. Anda boleh berhenti kapan saja. Ikut atau tidak, jawaban Anda tidak memengaruhi nilai mata kuliah.</p>
-    <h3>Data yang dicatat</h3>
-    <ul>
-      <li>Isian Anda: identitas (termasuk email, dan nomor WhatsApp bila Anda bersedia diwawancara), jawaban angket, catatan, dan menit yang Anda tandai.</li>
-      <li>Selama menonton: bagian video yang diputar, diulang, atau dilewati, dan jawaban kuis di dalam video.</li>
-      <li>Perangkat: jenis browser, ukuran layar, zona waktu, dan perkiraan kecepatan internet.</li>
+    <p class="pengantar">Tim peneliti FKIP Universitas Terbuka sedang menguji video pembelajaran mata kuliah <b></b> sebelum dipakai lebih luas. Ringkasnya:</p>
+    <ul class="poin">
+      <li><b>Sekitar ${menit} menit</b><span>termasuk menonton ${nVideo}</span></li>
+      <li><b>Sukarela</b><span>boleh berhenti kapan saja</span></li>
+      <li><b>Tidak memengaruhi nilai</b><span>tidak ada jawaban benar atau salah</span></li>
+      <li><b>Hanya untuk peneliti</b><span>hasil dilaporkan tanpa nama</span></li>
     </ul>
-    <h3>Siapa yang melihat dan berapa lama disimpan</h3>
-    <p>Data hanya bisa dilihat tim peneliti. Email dan nomor WhatsApp hanya dipakai peneliti untuk menghubungi Anda terkait penelitian ini. Hasil penelitian dilaporkan tanpa menyebut nama. Data disimpan di server Cloudflare dan dihapus setelah penelitian selesai, paling lambat [tanggal belum ditentukan].</p>
-    <p>Formulir ini disediakan Nyalain (dari Terangin). Nyalain tidak memakai data Anda untuk keperluan lain dan tidak mengirimi Anda promosi.</p>
-    <h3>Pertanyaan</h3>
-    <p>Hubungi peneliti: [nama dan kontak peneliti belum dikasih].</p>`;
+    <h3>Yang Anda lakukan</h3>
+    <ol class="alur">
+      <li>Isi identitas</li>
+      <li>Tonton ${nVideo} sampai selesai</li>
+      <li>Isi 25 pernyataan</li>
+      <li>Tulis catatan, boleh dikosongkan</li>
+    </ol>
+    <p class="kecil">Bila bersedia, Anda bisa dihubungi untuk wawancara lanjutan.</p>
+    <details class="rincian">
+      <summary>Rincian data yang dicatat dan cara penyimpanannya</summary>
+      <h4>Data yang dicatat</h4>
+      <ul>
+        <li>Isian Anda: identitas (termasuk email, dan nomor WhatsApp bila Anda bersedia diwawancara), jawaban angket, catatan, dan menit yang Anda tandai.</li>
+        <li>Selama menonton: bagian video yang diputar, diulang, atau dilewati, dan jawaban kuis di dalam video.</li>
+        <li>Perangkat: jenis browser, ukuran layar, zona waktu, dan perkiraan kecepatan internet.</li>
+      </ul>
+      <h4>Siapa yang melihat dan berapa lama disimpan</h4>
+      <p>Data hanya bisa dilihat tim peneliti. Email dan nomor WhatsApp hanya dipakai peneliti untuk menghubungi Anda terkait penelitian ini. Data disimpan di server Cloudflare dan dihapus setelah penelitian selesai, paling lambat [tanggal belum ditentukan].</p>
+      <p>Formulir ini disediakan Nyalain (dari Terangin). Nyalain tidak memakai data Anda untuk keperluan lain dan tidak mengirimi Anda promosi.</p>
+    </details>
+    <p class="kecil">Ada pertanyaan? Hubungi peneliti: [nama dan kontak peneliti belum dikasih].</p>`;
   $('teks-persetujuan').querySelector('b').textContent = form.matkul;
   const tombol = $('lanjut-persetujuan');
   const atur = () => { tombol.disabled = !s.persetujuan || !(s.terdaftar || LOKAL || tokenTurnstile); };
