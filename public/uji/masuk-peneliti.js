@@ -29,7 +29,7 @@ export async function pastikanMasuk($) {
       email = fe.elements.email.value.trim();
       const r = await post('/uji/api/masuk/minta', { email });
       if (r.status === 400) return galat('Format email belum benar.');
-      if (r.status === 429) return galat('Terlalu sering meminta kode. Tunggu 15 menit, lalu coba lagi.');
+      if (r.status === 429) return galat('Terlalu sering meminta kode. Tunggu beberapa menit, lalu coba lagi.');
       if (!r.ok) return galat('Kode belum bisa dikirim. Coba lagi beberapa saat lagi.');
       fe.hidden = true;
       fk.hidden = false;
@@ -40,6 +40,7 @@ export async function pastikanMasuk($) {
       // Kode yang ditempel dari email kadang ikut spasi/strip ("123 456").
       const r = await post('/uji/api/masuk/cek', { email, kode: fk.elements.kode.value.replace(/\D/g, '') });
       if (r.status === 400) return galat('Kode terdiri dari 6 angka.');
+      if (r.status === 429) return galat('Terlalu banyak percobaan. Tunggu 1 menit, lalu coba lagi.');
       if (!r.ok) return galat('Kode salah atau sudah tidak berlaku. Setelah 5 kali salah, minta kode baru.');
       // Kode benar tapi cookie nggak kebawa (mis. browser memblokir cookie): jangan diam-diam rusak.
       const orang = await saya();

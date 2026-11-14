@@ -22,6 +22,13 @@ export const ambilCookie = (header, nama) =>
 export const bolehForm = (forms, kode) => FORM_SAH.includes(kode) && (forms === '*' || forms.split(',').map((x) => x.trim()).includes(kode));
 export const daftarForm = (forms) => (forms === '*' ? [...FORM_SAH] : FORM_SAH.filter((k) => bolehForm(forms, k)));
 
+// Pembatas per IP buat semua yang nyoba masuk, terdaftar atau tidak (binding ratelimits BATAS_MASUK, 10/menit).
+// Gagal = tutup: binding hilang atau error dianggap ditolak.
+export async function lolosBatas(env, ip) {
+  if (!env.BATAS_MASUK) return false;
+  try { return (await env.BATAS_MASUK.limit({ key: `masuk:${ip || 'tanpa-ip'}` })).success === true; } catch { return false; }
+}
+
 export async function hash(teks) {
   const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(teks));
   return [...new Uint8Array(b)].map((x) => x.toString(16).padStart(2, '0')).join('');
@@ -53,7 +60,8 @@ export async function minta(body, env, ambil = fetch) {
   const terdaftar = await env.DB.prepare('SELECT 1 FROM peneliti WHERE email = ?1').bind(email).first();
   if (terdaftar) {
     const { n } = await env.DB.prepare('SELECT COUNT(*) AS n FROM kode_masuk WHERE email = ?1 AND dibuat > ?2').bind(email, sekarang - 15 * MENIT).first();
-    if (n >= MAKS_MINTA) return { status: 429, isi: { ok: false, galat: 'terlalu-sering' } };
+    // Kena batas: diam-diam nggak kirim, jawabannya sama dengan email tak terdaftar (429 di sini bikin email terdaftar ketahuan).
+    if (n >= MAKS_MINTA) return { status: 200, isi: { ok: true }, log: 'batas-per-email' };
     const kode = acakKode();
     await env.DB.prepare('INSERT INTO kode_masuk (email, hash, kedaluwarsa, coba, dibuat) VALUES (?1, ?2, ?3, 0, ?4)')
       .bind(email, await hash(`${email}:${kode}`), sekarang + UMUR_KODE, sekarang).run();
@@ -68,15 +76,22 @@ export async function minta(body, env, ambil = fetch) {
 
 export async function cek(body, env) {
   const email = normalEmail(body?.email);
-  const kode = String(body?.kode ?? '').trim();
+  const kode = String(body?.kode ?? '').slice(0, 20).replace(/[\s-]/g, ''); // "123 456" / "123-456" dari email
   if (!email || !/^\d{6}$/.test(kode)) return { status: 400, isi: { ok: false, galat: 'format' } };
   const sekarang = Date.now();
-  const k = await env.DB.prepare('SELECT rowid AS id, hash FROM kode_masuk WHERE email = ?1 AND kedaluwarsa > ?2 AND coba < ?3 ORDER BY dibuat DESC LIMIT 1')
-    .bind(email, sekarang, MAKS_COBA).first();
-  if (!k) return { status: 401, isi: { ok: false, galat: 'kode' } };
+  // Semua kode yang masih berlaku diterima (dosen bisa minta 2x lalu pakai kode dari email pertama). Maks 3 kode aktif
+  // (batas minta), tiap tebakan ngurangin jatah semua kode sekaligus.
+  const { results: aktif } = await env.DB.prepare('SELECT rowid AS id, hash FROM kode_masuk WHERE email = ?1 AND kedaluwarsa > ?2 AND coba < ?3')
+    .bind(email, sekarang, MAKS_COBA).all();
+  if (!aktif.length) return { status: 401, isi: { ok: false, galat: 'kode' } };
   // Tambah hitungan coba dulu, baru dibandingkan: tebakan paralel tetap kena batas.
-  const naik = await env.DB.prepare('UPDATE kode_masuk SET coba = coba + 1 WHERE rowid = ?1 AND coba < ?2').bind(k.id, MAKS_COBA).run();
-  if (!naik.meta.changes || k.hash !== (await hash(`${email}:${kode}`))) return { status: 401, isi: { ok: false, galat: 'kode' } };
+  const h = await hash(`${email}:${kode}`);
+  let cocok = false;
+  for (const k of aktif) {
+    const naik = await env.DB.prepare('UPDATE kode_masuk SET coba = coba + 1 WHERE rowid = ?1 AND coba < ?2').bind(k.id, MAKS_COBA).run();
+    if (naik.meta.changes && k.hash === h) cocok = true;
+  }
+  if (!cocok) return { status: 401, isi: { ok: false, galat: 'kode' } };
   const token = acakToken();
   await env.DB.batch([
     env.DB.prepare('DELETE FROM kode_masuk WHERE email = ?1').bind(email),

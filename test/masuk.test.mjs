@@ -59,17 +59,25 @@ test('kode salah 5 kali mengunci kode itu, kode benar pun ditolak', async () => 
   assert.equal((await cek({ email: 'dosen@ut.ac.id', kode }, env)).status, 401);
 });
 
+test('minta 2x, kode dari email pertama tetap bisa dipakai', async () => {
+  const { env, terkirim, ambil } = siapkan();
+  await minta({ email: 'dosen@ut.ac.id' }, env, ambil);
+  await minta({ email: 'dosen@ut.ac.id' }, env, ambil);
+  assert.equal((await cek({ email: 'dosen@ut.ac.id', kode: kodeDari(terkirim[0]) }, env)).status, 200);
+});
+
 test('minta kode dibatasi 3 per 15 menit', async () => {
-  const { env, ambil } = siapkan();
-  for (let i = 0; i < 3; i++) assert.equal((await minta({ email: 'dosen@ut.ac.id' }, env, ambil)).status, 200);
-  assert.equal((await minta({ email: 'dosen@ut.ac.id' }, env, ambil)).status, 429);
+  const { env, terkirim, ambil } = siapkan();
+  for (let i = 0; i < 4; i++) assert.deepEqual((await minta({ email: 'dosen@ut.ac.id' }, env, ambil)).isi, { ok: true }, 'jawaban sama dengan email tak terdaftar');
+  assert.equal(terkirim.length, 3);
 });
 
 test('kode yang sudah kedaluwarsa tetap dihitung sampai 15 menit', async () => {
-  const { env, ambil } = siapkan();
+  const { env, terkirim, ambil } = siapkan();
   const t = Date.now() - 12 * 60_000;
   for (let i = 0; i < 3; i++) env.DB.db.prepare('INSERT INTO kode_masuk VALUES (?, ?, ?, 0, ?)').run('dosen@ut.ac.id', 'x', t + 10 * 60_000, t + i);
-  assert.equal((await minta({ email: 'dosen@ut.ac.id' }, env, ambil)).status, 429);
+  await minta({ email: 'dosen@ut.ac.id' }, env, ambil);
+  assert.equal(terkirim.length, 0);
 });
 
 test('Resend gagal: 502 dan kodenya dibuang', async () => {
@@ -97,4 +105,15 @@ test('peneliti dihapus dari tabel langsung kehilangan sesi', async () => {
   const h = await cek({ email: 'tp@ut.ac.id', kode: kodeDari(terkirim[0]) }, env);
   env.DB.db.exec(`DELETE FROM peneliti WHERE email = 'tp@ut.ac.id'`);
   assert.equal(await siapa(cookieDari(h), env), null);
+});
+
+test('pembatas per IP: binding hilang/error = ditolak, kunci pakai IP', async () => {
+  const { lolosBatas } = await import('../src/masuk.js');
+  const kunci = [];
+  const batas = (success) => ({ limit: async ({ key }) => { kunci.push(key); return { success }; } });
+  assert.equal(await lolosBatas({}, '1.2.3.4'), false);
+  assert.equal(await lolosBatas({ BATAS_MASUK: { limit: async () => { throw new Error('x'); } } }, '1.2.3.4'), false);
+  assert.equal(await lolosBatas({ BATAS_MASUK: batas(false) }, '1.2.3.4'), false);
+  assert.equal(await lolosBatas({ BATAS_MASUK: batas(true) }, '1.2.3.4'), true);
+  assert.deepEqual(kunci, ['masuk:1.2.3.4', 'masuk:1.2.3.4']);
 });

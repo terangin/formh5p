@@ -6,7 +6,7 @@
 //   GET  /uji/*             -> aset statis
 import { periksa, FORM_SAH } from './simpan.js';
 import { cekTurnstile } from './turnstile.js';
-import { minta, cek, siapa, keluar, laporan, daftarForm } from './masuk.js';
+import { minta, cek, siapa, keluar, laporan, daftarForm, lolosBatas } from './masuk.js';
 
 const PEMUTAR = 'https://h5p.wello.web.id';
 const TS = 'https://challenges.cloudflare.com';
@@ -57,9 +57,13 @@ const balas = (h) => { const r = json(h.isi, h.status); if (h.cookie) r.headers.
 
 async function apiPeneliti(req, env, jalur) {
   if (req.method === 'POST' && !asal(req)) { catat('masuk-ditolak', { alasan: 'origin', jalur }); return json({ ok: false }, 403); }
+  if (req.method === 'POST' && jalur.startsWith('/uji/api/masuk/') && !(await lolosBatas(env, req.headers.get('cf-connecting-ip')))) {
+    catat('masuk-dibatasi', { jalur }); // tanpa IP (data responden & peneliti nggak nyimpen IP)
+    return json({ ok: false, galat: 'terlalu-sering' }, 429);
+  }
   if (jalur === '/uji/api/masuk/minta' && req.method === 'POST') {
     const h = await minta(await bacaJson(req), env);
-    if (h.status !== 200) catat('masuk-minta-gagal', { status: h.status, alasan: h.log || h.isi.galat });
+    if (h.status !== 200 || h.log) catat('masuk-minta-gagal', { status: h.status, alasan: h.log || h.isi.galat });
     return balas(h);
   }
   if (jalur === '/uji/api/masuk/cek' && req.method === 'POST') {
