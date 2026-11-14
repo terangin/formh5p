@@ -65,6 +65,13 @@ test('minta kode dibatasi 3 per 15 menit', async () => {
   assert.equal((await minta({ email: 'dosen@ut.ac.id' }, env, ambil)).status, 429);
 });
 
+test('kode yang sudah kedaluwarsa tetap dihitung sampai 15 menit', async () => {
+  const { env, ambil } = siapkan();
+  const t = Date.now() - 12 * 60_000;
+  for (let i = 0; i < 3; i++) env.DB.db.prepare('INSERT INTO kode_masuk VALUES (?, ?, ?, 0, ?)').run('dosen@ut.ac.id', 'x', t + 10 * 60_000, t + i);
+  assert.equal((await minta({ email: 'dosen@ut.ac.id' }, env, ambil)).status, 429);
+});
+
 test('Resend gagal: 502 dan kodenya dibuang', async () => {
   const { env } = siapkan();
   const h = await minta({ email: 'dosen@ut.ac.id' }, env, async () => ({ ok: false, status: 500 }));

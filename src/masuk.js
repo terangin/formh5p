@@ -47,7 +47,9 @@ export async function minta(body, env, ambil = fetch) {
   const email = normalEmail(body?.email);
   if (!email) return { status: 400, isi: { ok: false, galat: 'email' } };
   const sekarang = Date.now();
-  await env.DB.prepare('DELETE FROM kode_masuk WHERE kedaluwarsa < ?1').bind(sekarang).run();
+  // Yang dibuang cuma kode lebih tua dari jendela batas minta (15 menit), bukan yang baru kedaluwarsa (10 menit):
+  // kalau dibuang pas kedaluwarsa, batas 3 per 15 menit jadi bocor ke 3 per 10 menit.
+  await env.DB.prepare('DELETE FROM kode_masuk WHERE dibuat < ?1').bind(sekarang - 15 * MENIT).run();
   const terdaftar = await env.DB.prepare('SELECT 1 FROM peneliti WHERE email = ?1').bind(email).first();
   if (terdaftar) {
     const { n } = await env.DB.prepare('SELECT COUNT(*) AS n FROM kode_masuk WHERE email = ?1 AND dibuat > ?2').bind(email, sekarang - 15 * MENIT).first();

@@ -37,11 +37,15 @@ export async function pastikanMasuk($) {
       fk.elements.kode.focus();
     });
     fk.onsubmit = kirim(fk, async () => {
-      const r = await post('/uji/api/masuk/cek', { email, kode: fk.elements.kode.value.trim() });
+      // Kode yang ditempel dari email kadang ikut spasi/strip ("123 456").
+      const r = await post('/uji/api/masuk/cek', { email, kode: fk.elements.kode.value.replace(/\D/g, '') });
       if (r.status === 400) return galat('Kode terdiri dari 6 angka.');
       if (!r.ok) return galat('Kode salah atau sudah tidak berlaku. Setelah 5 kali salah, minta kode baru.');
+      // Kode benar tapi cookie nggak kebawa (mis. browser memblokir cookie): jangan diam-diam rusak.
+      const orang = await saya();
+      if (!orang) return galat('Kode benar, tetapi browser tidak menyimpan sesi masuk. Izinkan cookie untuk situs ini, lalu coba lagi.');
       $('masuk').hidden = true;
-      selesai(await saya());
+      selesai(orang);
     });
     $('ganti-email').onclick = () => { fk.reset(); fk.hidden = true; fe.hidden = false; galat(''); fe.elements.email.focus(); };
   });
