@@ -1,11 +1,14 @@
 // Tanda terima kasih (saldo dompet digital), opsional, di langkah Catatan sebelum Kirim.
 // Kalimatnya sengaja tidak menjanjikan semua responden dapat (bisa diundi): ketentuannya dari peneliti.
 // Data: s.hadiah = { mau, dompet, nomor, nama }. Nomor cuma disimpan kalau `mau` dicentang.
+// Saklar: dimatiin 2026-11-14 atas keputusan user (belum ada tanda terima kasih). Kode sengaja dibiarin, tinggal ganti true.
+export const HADIAH_AKTIF = false;
 export const DOMPET = ['GoPay', 'OVO', 'DANA', 'ShopeePay'];
 const POLA_NOMOR = /^(\+?62|0)8\d{7,12}$/;
 const bersih = (v) => String(v || '').replace(/[\s-]/g, '');
 
 export function pasangHadiah({ s, simpan, $ }) {
+  if (!HADIAH_AKTIF) { document.querySelector('.hadiah').hidden = true; return; }
   const f = $('form-hadiah');
   s.hadiah ??= { mau: false };
   const h = s.hadiah;
@@ -36,7 +39,7 @@ export function pasangHadiah({ s, simpan, $ }) {
 // Dipanggil sebelum Kirim. Balik pesan galat (string) atau null kalau aman.
 export function periksaHadiah({ s, $ }) {
   const f = $('form-hadiah');
-  if (!s.hadiah?.mau) return null;
+  if (!HADIAH_AKTIF || !s.hadiah?.mau) return null;
   const salah = [];
   if (!DOMPET.includes(s.hadiah.dompet)) salah.push(f.elements.dompet);
   if (!POLA_NOMOR.test(bersih(s.hadiah.nomor))) salah.push(f.elements.nomor);

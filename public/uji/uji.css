@@ -66,6 +66,7 @@ h3 { font-size: 18px; margin: 22px 0 8px; }
 input, select, textarea { font: inherit; font-size: 17px; font-weight: 400; color: var(--teks); background: #fbfcfd; border: 1.5px solid #a9bac8; border-radius: 12px; padding: 11px 14px; min-height: 50px; width: 100%; transition: border-color .15s, box-shadow .15s; }
 input:hover, select:hover, textarea:hover { border-color: var(--navy); }
 input:focus, select:focus, textarea:focus { outline: none; border-color: var(--navy); box-shadow: 0 0 0 4px rgb(22 78 123 / .15); background: #fff; }
+input[readonly], input[readonly]:hover { background: var(--navy-muda); border-color: var(--garis); color: var(--navy-tua); font-weight: 700; cursor: default; }
 textarea { resize: vertical; }
 [aria-invalid="true"] { border-color: var(--merah); box-shadow: 0 0 0 4px rgb(163 38 27 / .12); }
 

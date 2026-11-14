@@ -2,7 +2,7 @@
 // Video diputar pemutar Wello (h5p.wello.web.id/tonton) di iframe; protokol postMessage
 // ada di kepala tonton.js repo h5p-player. Versi coba: semua data baru disimpan di localStorage.
 import { FORM, BUTIR, PRODI, UPBJJ } from './konfig.js';
-import { pasangHadiah, periksaHadiah } from './hadiah.js';
+import { pasangHadiah, periksaHadiah, HADIAH_AKTIF } from './hadiah.js';
 
 const PEMUTAR = location.hostname === 'localhost' ? 'http://localhost:8093' : 'https://h5p.wello.web.id';
 
@@ -128,12 +128,12 @@ function isiPersetujuan() {
       <h4>Data yang dikumpulkan</h4>
       <ul>
         <li>Isian Anda: identitas (termasuk email, dan nomor WhatsApp bila Anda bersedia diwawancara), jawaban angket, catatan, dan menit yang Anda tandai.</li>
-        <li>Bila Anda ingin menerima tanda terima kasih: jenis dompet digital, nomor, dan nama pemilik akun.</li>
+        ${HADIAH_AKTIF ? '<li>Bila Anda ingin menerima tanda terima kasih: jenis dompet digital, nomor, dan nama pemilik akun.</li>' : ''}
         <li>Selama menonton: bagian video yang diputar, diulang, atau dilewati, dan jawaban kuis di dalam video.</li>
         <li>Perangkat: jenis browser, ukuran layar, zona waktu, dan perkiraan kecepatan internet.</li>
       </ul>
       <h4>Akses dan masa penyimpanan</h4>
-      <p>Data hanya dapat diakses oleh tim peneliti. Email dan nomor WhatsApp hanya dipakai peneliti untuk menghubungi Anda terkait penelitian ini. Data dompet digital hanya dipakai untuk mengirim tanda terima kasih. Data disimpan di server Cloudflare dan dihapus setelah penelitian selesai.</p>
+      <p>Data hanya dapat diakses oleh tim peneliti. Email dan nomor WhatsApp hanya dipakai peneliti untuk menghubungi Anda terkait penelitian ini.${HADIAH_AKTIF ? ' Data dompet digital hanya dipakai untuk mengirim tanda terima kasih.' : ''} Data disimpan di server Cloudflare dan dihapus setelah penelitian selesai.</p>
       <p>Formulir ini disediakan Nyalain (dari Terangin). Nyalain tidak memakai data Anda untuk keperluan lain dan tidak mengirimi Anda promosi.</p>
     </details>
     <p class="kecil">Pertanyaan mengenai penelitian ini dapat disampaikan kepada peneliti: <span id="kontak-peneliti"></span>.</p>
@@ -183,9 +183,12 @@ function isiPersetujuan() {
 function isiIdentitas() {
   const f = $('form-identitas');
   // Kotak ketik + saran (datalist). Isian tetap harus sama dengan salah satu pilihan resmi (dicek waktu Lanjut).
-  $('daftar-prodi').append(...PRODI.flatMap(([fak, daftar]) => daftar.map((p) => el('option', { value: p, label: fak }))));
+  // Form yang punya prodi (semua form sekarang): prodi dikunci sesuai mata kuliah (keputusan user 2026-11-14).
+  // Daftar PRODI lengkap tetap dipakai kalau suatu form nggak punya `prodi`.
+  if (form.prodi) { s.identitas.prodi = form.prodi; f.elements.prodi.readOnly = true; f.elements.prodi.removeAttribute('placeholder'); }
+  else $('daftar-prodi').append(...PRODI.flatMap(([fak, daftar]) => daftar.map((p) => el('option', { value: p, label: fak }))));
   $('daftar-upbjj').append(...UPBJJ.map((u) => el('option', { value: u })));
-  const resmi = { prodi: PRODI.flatMap(([, d]) => d), upbjj: UPBJJ };
+  const resmi = { prodi: form.prodi ? [form.prodi] : PRODI.flatMap(([, d]) => d), upbjj: UPBJJ };
   // Ketikan yang cuma beda huruf besar/kecil dirapikan ke nama resmi.
   for (const n of Object.keys(resmi)) {
     f.elements[n].addEventListener('change', (e) => {

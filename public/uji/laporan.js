@@ -1,6 +1,7 @@
 // Laporan peneliti. Lokal (localhost): pakai data CONTOH dari dummy.js. Situs asli: ambil dari API (belum dibikin,
 // nunggu login peneliti). Semua isian responden ditulis lewat textContent, jangan innerHTML (A05).
 import { FORM, BUTIR } from './konfig.js';
+import { HADIAH_AKTIF } from './hadiah.js';
 import { ringkas, petaTanda, csv, csvOlahan, csvHadiah, penerimaHadiah, statistikButir, statistikAspek, tafsirAlpha } from './hitung.js';
 
 const LOKAL = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
@@ -141,6 +142,8 @@ async function buka(kode) {
 }
 
 $('contoh').hidden = !LOKAL;
+$('terima-kasih').hidden = !HADIAH_AKTIF;
+document.querySelector('.loncat a[href="#terima-kasih"]').hidden = !HADIAH_AKTIF;
 $('tab-form').append(...Object.entries(FORM).map(([kode, f]) => {
   const [nama, kodeMk] = f.matkul.split(' (');
   const t = el('button', { type: 'button', title: f.matkul },
