@@ -17,6 +17,22 @@
     <h1 id="judul">Laporan</h1>
     <p class="sub" id="sub"></p>
   </header>
+  <p class="akun" id="akun" hidden>Masuk sebagai <b id="akun-email"></b> · <button type="button" class="tombol-teks" id="keluar">Keluar</button></p>
+
+  <section class="kartu-lap kotak-masuk" id="masuk" hidden>
+    <h2>Masuk untuk melihat laporan</h2>
+    <form id="form-email" class="isian">
+      <label>Email peneliti <input name="email" type="email" required autocomplete="email" inputmode="email" placeholder="nama@ecampus.ut.ac.id"></label>
+      <button type="submit" class="tombol">Kirim kode masuk</button>
+    </form>
+    <form id="form-kode" class="isian" hidden>
+      <p class="kecil" id="info-kode" aria-live="polite"></p>
+      <label>Kode 6 angka <input name="kode" required inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="\d{6}"></label>
+      <div class="aksi"><button type="submit" class="tombol">Masuk</button><button type="button" class="tombol-teks" id="ganti-email">Ganti email atau minta kode baru</button></div>
+    </form>
+    <p class="galat" id="galat-masuk" role="alert" hidden></p>
+  </section>
+
   <p class="contoh" id="contoh" hidden><b>Data contoh.</b> Bukan jawaban responden asli, dibuat otomatis untuk melihat tampilan laporan.</p>
   <nav class="tab-form" id="tab-form" aria-label="Pilih formulir"></nav>
   <p class="galat" id="galat" hidden></p>

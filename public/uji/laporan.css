@@ -122,3 +122,9 @@
   .tab-form button { scroll-snap-align: start; }
 }
 @media (max-width: 760px) { .sumbu-peta span:nth-child(even):not(:last-child) { display: none; } }
+
+/* Masuk peneliti */
+.kotak-masuk { max-width: 520px; margin-inline: auto; }
+.kotak-masuk .tombol { justify-self: start; }
+.akun { margin: 12px 0 0; font-size: 15px; color: var(--teks-pudar); }
+.akun .tombol-teks { min-height: 24px; padding: 0 2px; font-size: 15px; }

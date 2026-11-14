@@ -1,9 +1,12 @@
 // Worker nyalain.kitaterangin.id/uji* (akun Cloudflare Terangin). Sisa domain tetap ke PocketBase rumah lewat tunnel.
 //   GET  /uji/<kode form>   -> halaman form (public/uji/index.html)
 //   POST /uji/api/simpan    -> simpan/ubah jawaban ke D1 (dikunci setelah "selesai")
+//   GET  /uji/laporan       -> halaman laporan peneliti (login kode email, lihat masuk.js)
+//   /uji/api/masuk/*, /uji/api/keluar, /uji/api/saya, /uji/api/laporan -> masuk.js
 //   GET  /uji/*             -> aset statis
 import { periksa, FORM_SAH } from './simpan.js';
 import { cekTurnstile } from './turnstile.js';
+import { minta, cek, siapa, keluar, laporan, daftarForm } from './masuk.js';
 
 const PEMUTAR = 'https://h5p.wello.web.id';
 const TS = 'https://challenges.cloudflare.com';
@@ -48,12 +51,44 @@ async function simpan(req, env) {
   return json({ ok: true });
 }
 
+const asal = (req) => req.headers.get('origin') === new URL(req.url).origin;
+const bacaJson = async (req) => { try { return await req.json(); } catch { return null; } };
+const balas = (h) => { const r = json(h.isi, h.status); if (h.cookie) r.headers.append('set-cookie', h.cookie); return r; };
+
+async function apiPeneliti(req, env, jalur) {
+  if (req.method === 'POST' && !asal(req)) { catat('masuk-ditolak', { alasan: 'origin', jalur }); return json({ ok: false }, 403); }
+  if (jalur === '/uji/api/masuk/minta' && req.method === 'POST') {
+    const h = await minta(await bacaJson(req), env);
+    if (h.status !== 200) catat('masuk-minta-gagal', { status: h.status, alasan: h.log || h.isi.galat });
+    return balas(h);
+  }
+  if (jalur === '/uji/api/masuk/cek' && req.method === 'POST') {
+    const h = await cek(await bacaJson(req), env);
+    catat(h.status === 200 ? 'masuk-berhasil' : 'masuk-gagal', { status: h.status }); // ponytail: alert belum ada, baca di Workers Logs
+    return balas(h);
+  }
+  if (jalur === '/uji/api/keluar' && req.method === 'POST') return balas({ status: 200, isi: { ok: true }, cookie: await keluar(req.headers.get('cookie'), env) });
+  if (req.method !== 'GET') return json({ ok: false }, 405);
+  const orang = await siapa(req.headers.get('cookie'), env);
+  if (!orang) return json({ ok: false, galat: 'belum-masuk' }, 401);
+  if (jalur === '/uji/api/saya') return json({ ok: true, email: orang.email, forms: daftarForm(orang.forms) });
+  if (jalur === '/uji/api/laporan') {
+    const form = new URL(req.url).searchParams.get('form') || '';
+    const h = await laporan(orang, form, env);
+    if (h.status !== 200) catat('laporan-ditolak', { email: orang.email, form });
+    return balas(h);
+  }
+  return json({ ok: false }, 404);
+}
+
 export default {
   async fetch(req, env) {
     const url = new URL(req.url);
     try {
       if (url.pathname === '/uji/api/simpan') return req.method === 'POST' ? await simpan(req, env) : json({ ok: false }, 405);
+      if (/^\/uji\/api\/(masuk\/(minta|cek)|keluar|saya|laporan)$/.test(url.pathname)) return await apiPeneliti(req, env, url.pathname);
       if (req.method !== 'GET' && req.method !== 'HEAD') return json({ ok: false }, 405);
+      if (url.pathname === '/uji/laporan') return pasang(await env.ASSETS.fetch(new Request(new URL('/uji/laporan.html', url))), { 'cache-control': 'no-cache' });
       const kode = url.pathname.match(/^\/uji\/([a-z0-9-]+)$/)?.[1];
       if (kode) {
         if (!FORM_SAH.includes(kode)) return pasang(new Response('Formulir tidak ditemukan. Minta link yang benar ke dosen atau peneliti.', { status: 404, headers: { 'content-type': 'text/plain; charset=utf-8' } }));

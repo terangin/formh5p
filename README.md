@@ -37,14 +37,12 @@ node dev-server.mjs "C:/Users/Luthfi Perdana/Desktop/h5p-player" 8093
 node dev-server.mjs "C:/Users/Luthfi Perdana/Desktop/uji-nyalain/public" 5500
 ```
 
-Buka `http://localhost:5500/uji/ut-tp` (cuma tampilan, tanpa API). **Laporan peneliti (data CONTOH): `http://localhost:5500/uji/laporan.html`** (statistik deskriptif, % kelayakan, validitas r butir-total terkoreksi vs r tabel, Cronbach alpha, peta menit, profil, CSV mentah + olahan; logika di `public/uji/hitung.js` + `test/hitung.test.mjs`). Di situs asli belum aktif (nunggu login peneliti + API). Di sini muncul **bilah Mode dev** (pojok kanan atas): loncat ke langkah mana aja tanpa nonton habis/ngisi semua, reset, ganti form. Bilah ini cuma ada di localhost:5500.
+Buka `http://localhost:5500/uji/ut-tp` (cuma tampilan, tanpa API). **Laporan peneliti (data CONTOH): `http://localhost:5500/uji/laporan.html`** (statistik deskriptif, % kelayakan, validitas r butir-total terkoreksi vs r tabel, Cronbach alpha, peta menit, profil, CSV mentah + olahan; logika di `public/uji/hitung.js` + `test/hitung.test.mjs`). Di situs asli: **`nyalain.kitaterangin.id/uji/laporan`**, masuk pakai kode 6 angka lewat email (kode `src/masuk.js` + `public/uji/masuk-peneliti.js`, tes `test/masuk.test.mjs` pakai node:sqlite). Yang boleh masuk = tabel `peneliti` di D1 (`forms` = `*` atau `ut-tp,ut-pai`); hapus barisnya = aksesnya langsung putus. Email dikirim lewat Resend dari `nyalain@kitaterangin.id`, butuh secret Worker `RESEND_API_KEY` (user yang masukin). Di sini muncul **bilah Mode dev** (pojok kanan atas): loncat ke langkah mana aja tanpa nonton habis/ngisi semua, reset, ganti form. Bilah ini cuma ada di localhost:5500.
 
-Worker + API: `npx wrangler@4 d1 execute uji-ut --local --file skema.sql` sekali, lalu `npx wrangler@4 dev --local --port 5501`.
+Worker + API: `npx wrangler@4 d1 execute uji-ut --local --file skema.sql` sekali, lalu `npx wrangler@4 dev --local --port 5501 --compatibility-date 2026-08-06` (workerd lokal belum kenal tanggal di wrangler.jsonc). Laporan di 5501 pakai login asli + D1 lokal; tanpa `RESEND_API_KEY` kode nggak kekirim, jadi buat ngetes isi baris `kode_masuk` sendiri (hash = sha256 `email:kode`).
 Mode `--local` nggak nyentuh akun mana pun. Video nggak muncul di sini karena CSP cuma ngizinin h5p.wello.web.id. Pemutar lokal cuma mau ngobrol (postMessage) sama induk di localhost
 port 5500/5501/8090 (lihat `INDUK` di `tonton.js`). Data versi coba cuma di localStorage browser.
 
 ## Belum
 
-Secret `TURNSTILE_SECRET` (user, setelah rotate karena secret lama sempat kebaca alat Claude), tes Turnstile asli + replay ditolak, halaman laporan peneliti (grafik ala Google Forms + CSV), email peneliti, isi placeholder
-(tanggal hapus data, kontak peneliti, judul video Arab, kalimat promosi), event `selesai` belum dites,
-tampilan HP belum dicek.
+Tes Turnstile asli + replay ditolak, event `selesai`, tampilan HP asli. Login peneliti: kirim email beneran (nunggu `RESEND_API_KEY`). Tanda terima kasih dimatikan (`HADIAH_AKTIF` di `public/uji/hadiah.js`), kodenya sengaja disimpan. Hapus baris tes di D1 sebelum disebar.

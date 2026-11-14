@@ -1,10 +1,12 @@
-// Laporan peneliti. Lokal (localhost): pakai data CONTOH dari dummy.js. Situs asli: ambil dari API (belum dibikin,
-// nunggu login peneliti). Semua isian responden ditulis lewat textContent, jangan innerHTML (A05).
+// Laporan peneliti. Lokal (localhost:5500, server statis): pakai data CONTOH dari dummy.js. Selain itu (situs asli,
+// wrangler dev): masuk dulu (masuk-peneliti.js), lalu ambil dari /uji/api/laporan. Isian responden ditulis lewat
+// textContent, jangan innerHTML (A05).
 import { FORM, BUTIR } from './konfig.js';
 import { HADIAH_AKTIF } from './hadiah.js';
+import { pastikanMasuk, keluarPeneliti } from './masuk-peneliti.js';
 import { ringkas, petaTanda, csv, csvOlahan, csvHadiah, penerimaHadiah, statistikButir, statistikAspek, tafsirAlpha } from './hitung.js';
 
-const LOKAL = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+const LOKAL = location.hostname === 'localhost' && location.port === '5500';
 const SKALA = ['Sangat tidak setuju', 'Tidak setuju', 'Ragu-ragu', 'Setuju', 'Sangat setuju'];
 const TEKS_BUTIR = BUTIR.flatMap(([, d]) => d);
 const $ = (id) => document.getElementById(id);
@@ -23,7 +25,8 @@ async function ambil(kode) {
     return buatDummy(kode, FORM[kode]);
   }
   const r = await fetch(`/uji/api/laporan?form=${encodeURIComponent(kode)}`, { credentials: 'same-origin' });
-  if (r.status === 401 || r.status === 404) throw new Error('Halaman laporan di situs asli belum aktif: login peneliti belum dipasang.');
+  if (r.status === 401) throw new Error('Sesi Anda sudah berakhir. Muat ulang halaman untuk masuk lagi.');
+  if (r.status === 403) throw new Error('Anda tidak memiliki akses ke formulir ini.');
   if (!r.ok) throw new Error('Data belum bisa diambil. Coba muat ulang halaman.');
   return (await r.json()).baris;
 }
@@ -144,14 +147,29 @@ async function buka(kode) {
 $('contoh').hidden = !LOKAL;
 $('terima-kasih').hidden = !HADIAH_AKTIF;
 document.querySelector('.loncat a[href="#terima-kasih"]').hidden = !HADIAH_AKTIF;
-$('tab-form').append(...Object.entries(FORM).map(([kode, f]) => {
-  const [nama, kodeMk] = f.matkul.split(' (');
-  const t = el('button', { type: 'button', title: f.matkul },
-    el('small', { textContent: f.video.length > 1 ? [kodeMk?.replace(')', ''), `${f.video.length} video`].filter(Boolean).join(' · ') : nama }),
-    el('b', { textContent: f.video.length > 1 ? nama : f.video[0].judul }));
-  t.dataset.kode = kode;
-  t.onclick = () => buka(kode);
-  return t;
-}));
-const awal = new URLSearchParams(location.search).get('form');
-buka(FORM[awal] ? awal : Object.keys(FORM)[0]);
+async function mulai() {
+  let izin = Object.keys(FORM);
+  if (!LOKAL) {
+    try {
+      const orang = await pastikanMasuk($);
+      izin = orang.forms.filter((k) => FORM[k]);
+      $('akun-email').textContent = orang.email;
+      $('akun').hidden = false;
+      $('keluar').onclick = keluarPeneliti;
+    } catch (e) { $('galat').textContent = e.message; $('galat').hidden = false; return; }
+    if (!izin.length) { $('galat').textContent = 'Akun Anda belum diberi akses ke formulir mana pun. Hubungi pengelola.'; $('galat').hidden = false; return; }
+  }
+  $('tab-form').append(...izin.map((kode) => {
+    const f = FORM[kode];
+    const [nama, kodeMk] = f.matkul.split(' (');
+    const t = el('button', { type: 'button', title: f.matkul },
+      el('small', { textContent: f.video.length > 1 ? [kodeMk?.replace(')', ''), `${f.video.length} video`].filter(Boolean).join(' · ') : nama }),
+      el('b', { textContent: f.video.length > 1 ? nama : f.video[0].judul }));
+    t.dataset.kode = kode;
+    t.onclick = () => buka(kode);
+    return t;
+  }));
+  const awal = new URLSearchParams(location.search).get('form');
+  buka(izin.includes(awal) ? awal : izin[0]);
+}
+mulai();
