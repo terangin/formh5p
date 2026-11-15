@@ -37,6 +37,8 @@ function unduh(nama, isi) {
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 }
 
+// Waktu dari server (UTC) ditampilkan WIB, biar sama buat peneliti di mana pun.
+const jamWib = (iso) => new Date(iso).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short', timeZone: 'Asia/Jakarta' }) + ' WIB';
 const tabel = (kepala, baris) => el('table', { className: 'tabel' },
   el('thead', {}, el('tr', {}, ...kepala.map((k) => el('th', { scope: 'col', textContent: k })))),
   el('tbody', {}, ...baris.map((b) => el('tr', {}, ...b.map((x, i) => el(i ? 'td' : 'th', { scope: i ? undefined : 'row', textContent: x ?? '–' }))))));
@@ -115,9 +117,9 @@ function tampil(kode, baris) {
     ...(r.catatan.length > 6 ? [el('details', { className: 'rincian' }, el('summary', { textContent: `Tampilkan ${r.catatan.length - 6} catatan lainnya` }), kartuCatatan(r.catatan.slice(6)))] : [])]));
 
   const ganda = cariGanda(baris);
-  $('responden').replaceChildren(tabel(['Nama', 'NIM', 'Email', 'Prodi', 'UPBJJ', 'Status', 'Mulai', 'Menit', 'Video ditonton', 'Wawancara', 'WhatsApp'],
+  $('responden').replaceChildren(tabel(['Nama', 'NIM', 'Email', 'Prodi', 'UPBJJ', 'Status', 'Tanggal uji coba', 'Mulai', 'Dikirim', 'Menit', 'Video ditonton', 'Wawancara', 'WhatsApp'],
     [...baris].sort((a, b) => a.mulai.localeCompare(b.mulai)).map((b) => [b.identitas?.nama, b.identitas?.nim, b.identitas?.email, b.identitas?.prodi, b.identitas?.upbjj,
-      ganda.has(b.id) ? 'Ganda, tidak dihitung' : b.selesai ? 'Lengkap' : 'Belum selesai', new Date(b.mulai).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' }),
+      ganda.has(b.id) ? 'Ganda, tidak dihitung' : b.selesai ? 'Lengkap' : 'Belum selesai', b.identitas?.tanggal, jamWib(b.mulai), b.selesai ? jamWib(b.selesai) : '–',
       b.selesai ? angka((Date.parse(b.selesai) - Date.parse(b.mulai)) / 60000, 0) : '–',
       form.video.map((v) => `${persenDitonton(b.video?.[v.isi], b.video?.[v.isi]?.durasi || v.detik) ?? 0}%`).join(' · '), b.identitas?.bersedia_wawancara ? 'Ya' : 'Tidak', b.identitas?.whatsapp])));
 

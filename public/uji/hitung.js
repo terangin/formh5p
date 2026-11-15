@@ -30,6 +30,8 @@ export function detikDitonton(v, durasi) {
 }
 export const persenDitonton = (v, durasi) => (durasi ? Math.round((detikDitonton(v, durasi) / durasi) * 100) : null);
 
+// '2026-11-15T12:49:55Z' -> '2026-11-15 19:49:55' (WIB). Format sv-SE = ISO tanpa huruf T.
+const wib = (iso) => new Date(iso).toLocaleString('sv-SE', { timeZone: 'Asia/Jakarta' });
 const bulat = (x, d = 2) => Math.round(x * 10 ** d) / 10 ** d;
 const lengkap = (b) => !!b.selesai;
 
@@ -125,7 +127,7 @@ export function csv(baris, videoForm) {
   const ganda = cariGanda(baris);
   const mmdd = (d) => `${String(Math.floor(d / 60)).padStart(2, '0')}:${String(Math.round(d % 60)).padStart(2, '0')}`;
   const kolom = [
-    ['id', (b) => b.id], ['status', (b) => (ganda.has(b.id) ? 'ganda' : b.selesai ? 'lengkap' : 'belum selesai')], ['ganda_dari', (b) => ganda.get(b.id) ?? ''], ['mulai', (b) => b.mulai], ['selesai', (b) => b.selesai || ''],
+    ['id', (b) => b.id], ['status', (b) => (ganda.has(b.id) ? 'ganda' : b.selesai ? 'lengkap' : 'belum selesai')], ['ganda_dari', (b) => ganda.get(b.id) ?? ''], ['mulai', (b) => b.mulai], ['selesai', (b) => b.selesai || ''], ['waktu_kirim_wib', (b) => (b.selesai ? wib(b.selesai) : '')],
     ['menit_mengisi', (b) => (b.selesai ? bulat((Date.parse(b.selesai) - Date.parse(b.mulai)) / 60000, 1) : '')],
     ...['nama', 'nim', 'email', 'prodi', 'semester', 'upbjj', 'pekerjaan', 'perangkat', 'perangkat_lain', 'tanggal'].map((k) => [k, (b) => b.identitas?.[k] ?? '']),
     ['bersedia_wawancara', (b) => (b.identitas?.bersedia_wawancara ? 'ya' : 'tidak')], ['whatsapp', (b) => b.identitas?.whatsapp ?? ''],

@@ -45,4 +45,4 @@ port 5500/5501/8090 (lihat `INDUK` di `tonton.js`). Data versi coba cuma di loca
 
 ## Belum
 
-Tes Turnstile asli + replay ditolak, event `selesai`, tampilan HP asli. Login peneliti: kirim email beneran (nunggu `RESEND_API_KEY`). Tanda terima kasih dimatikan (`HADIAH_AKTIF` di `public/uji/hadiah.js`), kodenya sengaja disimpan. Hapus baris tes di D1 sebelum disebar.
+Tes Turnstile asli + replay ditolak, event `selesai`, tampilan HP asli. Login peneliti: kirim email beneran (nunggu `RESEND_API_KEY`). Tanda terima kasih dimatikan (`HADIAH_AKTIF` di `public/uji/hadiah.js`), kodenya sengaja disimpan. Baris tes di D1 udah dihapus semua 2026-11-15 malam (tabel `jawaban` kosong, `peneliti` 7 email nggak disentuh).

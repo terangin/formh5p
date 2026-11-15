@@ -99,3 +99,9 @@ test('ganda: NIM/email sama, yang selesai duluan yang dihitung', () => {
   assert.equal(h.butir[0].rata, 5); // jawaban 1 dari b dan d nggak ikut
   assert.ok(csv(data, []).includes('"ganda","a"') || csv(data, []).includes('ganda,a'));
 });
+
+test('waktu kirim WIB terpisah dari tanggal uji coba', () => {
+  const t = csv([{ id: 'a', mulai: '2026-11-15T12:22:50Z', selesai: '2026-11-15T12:49:55Z', identitas: { tanggal: '2026-11-14' }, butir: {} }], []);
+  assert.ok(t.includes('2026-11-15 19:49:55'));
+  assert.ok(t.includes('2026-11-14'));
+});
