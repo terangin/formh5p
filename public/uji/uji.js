@@ -148,7 +148,7 @@ function isiPersetujuan() {
       </ol>
     </div>`;
   $('teks-persetujuan').querySelector('b').textContent = form.matkul;
-  $('kontak-peneliti').textContent = form.kontak.map(([nama, hp]) => `${nama} (${hp})`).join(' atau ');
+  $('kontak-peneliti').textContent = form.kontak.map(([nama, prodi, hp]) => `${nama}, dosen Program Studi ${prodi} (${hp})`).join(' atau ');
   const tombol = $('lanjut-persetujuan');
   const atur = () => { tombol.disabled = !s.persetujuan || !(s.terdaftar || LOKAL || tokenTurnstile); };
   $('setuju').checked = !!s.persetujuan;
