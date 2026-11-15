@@ -136,7 +136,7 @@ function isiPersetujuan() {
       <p>Data hanya dapat diakses oleh tim peneliti. Email dan nomor WhatsApp hanya dipakai peneliti untuk menghubungi Anda terkait penelitian ini.${HADIAH_AKTIF ? ' Data dompet digital hanya dipakai untuk mengirim tanda terima kasih.' : ''} Data disimpan di server Cloudflare dan dihapus setelah penelitian selesai.</p>
       <p>Formulir ini disediakan Nyalain (dari Terangin). Nyalain tidak memakai data Anda untuk keperluan lain dan tidak mengirimi Anda promosi.</p>
     </details>
-    <p class="kecil">Pertanyaan mengenai penelitian ini dapat disampaikan kepada peneliti: <span id="kontak-peneliti"></span>.</p>
+    <div class="kecil"><p>Pertanyaan mengenai penelitian ini dapat disampaikan kepada peneliti:</p><ul class="kontak" id="kontak-peneliti"></ul></div>
     <div class="pernyataan">
       <h3>Pernyataan persetujuan</h3>
       <p>Dengan mencentang kotak di bawah ini, saya menyatakan bahwa:</p>
@@ -148,7 +148,8 @@ function isiPersetujuan() {
       </ol>
     </div>`;
   $('teks-persetujuan').querySelector('b').textContent = form.matkul;
-  $('kontak-peneliti').textContent = form.kontak.map(([nama, prodi, hp]) => `${nama}, dosen Program Studi ${prodi} (${hp})`).join(' atau ');
+  $('kontak-peneliti').replaceChildren(...form.kontak.map(([nama, prodi, hp]) => el('li', {},
+    el('b', { textContent: nama }), `Dosen Program Studi ${prodi}`, el('a', { href: `tel:${hp.replace(/\D/g, '')}`, textContent: hp }))));
   const tombol = $('lanjut-persetujuan');
   const atur = () => { tombol.disabled = !s.persetujuan || !(s.terdaftar || LOKAL || tokenTurnstile); };
   $('setuju').checked = !!s.persetujuan;
