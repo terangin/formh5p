@@ -4,7 +4,7 @@
 import { FORM, BUTIR } from './konfig.js';
 import { HADIAH_AKTIF } from './hadiah.js';
 import { pastikanMasuk, keluarPeneliti } from './masuk-peneliti.js';
-import { ringkas, petaTanda, csv, csvOlahan, csvHadiah, penerimaHadiah, statistikButir, statistikAspek, tafsirAlpha } from './hitung.js';
+import { ringkas, cariGanda, persenDitonton, petaTanda, csv, csvOlahan, csvHadiah, penerimaHadiah, statistikButir, statistikAspek, tafsirAlpha } from './hitung.js';
 
 const LOKAL = location.hostname === 'localhost' && location.port === '5500';
 const SKALA = ['Sangat tidak setuju', 'Tidak setuju', 'Ragu-ragu', 'Setuju', 'Sangat setuju'];
@@ -49,7 +49,7 @@ function tampil(kode, baris) {
   $('sub').textContent = form.video.map((v) => v.judul).join(' · ');
 
   $('ubin').replaceChildren(...[
-    ['Responden lengkap', r.n, `dari ${r.n + r.belumSelesai} yang memulai`],
+    ['Responden lengkap', r.n, `dari ${r.n + r.ganda + r.belumSelesai} yang memulai${r.ganda ? `; ${r.ganda} isian ganda tidak dihitung` : ''}`],
     ['Menonton sampai habis', `${r.n ? Math.round((r.nontonHabis / r.n) * 100) : 0}%`, `${r.nontonHabis} responden${r.lewatiVideo ? `; ${r.lewatiVideo} lanjut tanpa menonton habis` : ''}`],
     ['Waktu mengisi (median)', r.menitMedian == null ? '–' : `${angka(r.menitMedian, 0)} menit`, 'dari mulai sampai kirim'],
     ['Kelayakan keseluruhan', r.total.persen == null ? '–' : `${angka(r.total.persen, 1)}%`, pilKategori(r.total.kategori)],
@@ -114,10 +114,12 @@ function tampil(kode, baris) {
   $('catatan').replaceChildren(...(!r.catatan.length ? [el('p', { className: 'kecil', textContent: 'Belum ada catatan.' })] : [kartuCatatan(r.catatan.slice(0, 6)),
     ...(r.catatan.length > 6 ? [el('details', { className: 'rincian' }, el('summary', { textContent: `Tampilkan ${r.catatan.length - 6} catatan lainnya` }), kartuCatatan(r.catatan.slice(6)))] : [])]));
 
-  $('responden').replaceChildren(tabel(['Nama', 'NIM', 'Email', 'Prodi', 'UPBJJ', 'Status', 'Mulai', 'Menit', 'Wawancara', 'WhatsApp'],
+  const ganda = cariGanda(baris);
+  $('responden').replaceChildren(tabel(['Nama', 'NIM', 'Email', 'Prodi', 'UPBJJ', 'Status', 'Mulai', 'Menit', 'Video ditonton', 'Wawancara', 'WhatsApp'],
     [...baris].sort((a, b) => a.mulai.localeCompare(b.mulai)).map((b) => [b.identitas?.nama, b.identitas?.nim, b.identitas?.email, b.identitas?.prodi, b.identitas?.upbjj,
-      b.selesai ? 'Lengkap' : 'Belum selesai', new Date(b.mulai).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' }),
-      b.selesai ? angka((Date.parse(b.selesai) - Date.parse(b.mulai)) / 60000, 0) : '–', b.identitas?.bersedia_wawancara ? 'Ya' : 'Tidak', b.identitas?.whatsapp])));
+      ganda.has(b.id) ? 'Ganda, tidak dihitung' : b.selesai ? 'Lengkap' : 'Belum selesai', new Date(b.mulai).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' }),
+      b.selesai ? angka((Date.parse(b.selesai) - Date.parse(b.mulai)) / 60000, 0) : '–',
+      form.video.map((v) => `${persenDitonton(b.video?.[v.isi], b.video?.[v.isi]?.durasi || v.detik) ?? 0}%`).join(' · '), b.identitas?.bersedia_wawancara ? 'Ya' : 'Tidak', b.identitas?.whatsapp])));
 
   const penerima = penerimaHadiah(baris);
   $('jumlah-hadiah').textContent = `${penerima.length} responden lengkap ingin dihubungi untuk menerima tanda terima kasih.`;

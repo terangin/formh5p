@@ -182,3 +182,4 @@ textarea { resize: vertical; }
 .kontak { margin: 6px 0 0; padding: 0; list-style: none; display: grid; gap: 8px; }
 .kontak b { display: block; color: var(--teks); }
 .kontak a { display: block; width: fit-content; }
+.galat.peringatan { color: #6b4a00; background: var(--kuning-muda); }

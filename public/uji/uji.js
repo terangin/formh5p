@@ -3,6 +3,7 @@
 // ada di kepala tonton.js repo h5p-player. Versi coba: semua data baru disimpan di localStorage.
 import { FORM, BUTIR, PRODI, UPBJJ } from './konfig.js';
 import { pasangHadiah, periksaHadiah, HADIAH_AKTIF } from './hadiah.js';
+import { detikDitonton } from './hitung.js';
 
 const PEMUTAR = location.hostname === 'localhost' ? 'http://localhost:8093' : 'https://h5p.wello.web.id';
 
@@ -316,6 +317,7 @@ function mulaiJamPosisi() {
         if (d != null && (!p.length || Math.abs(p[p.length - 1][1] - d) > 0.5)) p.push([Date.now() - Date.parse(s.mulai), Math.round(d * 10) / 10]);
       });
       simpan();
+      perbaruiStatus();
     } finally { sedangSampel = false; }
   }, 5000);
 }
@@ -349,11 +351,13 @@ addEventListener('message', (e) => {
 });
 
 const semuaSelesai = () => form.video.every((v) => s.video[v.isi].selesai > 0);
+const ditonton = (v) => { const dur = s.video[v.isi].durasi || v.detik; return [detikDitonton(s.video[v.isi], dur), dur]; };
 function perbaruiStatus() {
   for (const v of form.video) {
     const st = $(`status-${v.isi}`), x = s.video[v.isi];
     if (!st) continue;
-    st.textContent = x.gagal ? 'Gagal dimuat' : x.selesai ? 'Sudah ditonton' : 'Belum selesai';
+    const [d, dur] = ditonton(v);
+    st.textContent = x.gagal ? 'Gagal dimuat' : x.selesai ? 'Sudah ditonton' : d ? `Ditonton ${mmdd(d)} dari ${mmdd(dur)}` : 'Belum ditonton';
     st.classList.toggle('beres', !!x.selesai);
     st.classList.toggle('gagal', !!x.gagal);
   }
@@ -371,7 +375,7 @@ function isiCara() {
       ? li('Video tidak bisa dilompati ke depan. Anda tetap bisa mundur untuk mengulang bagian tertentu, dan bisa menjeda kapan saja.')
       : li('Video bisa dijeda, dimundurkan, atau dimajukan kapan saja.'),
     ...(form.tombolLompat ? [li('Ada tombol dan kotak teks di dalam video. Tekan untuk melompat ke bagian tertentu atau membaca penjelasan.')] : []),
-    li(form.video.length > 1 ? 'Kedua video harus ditonton sampai selesai sebelum lanjut ke angket.' : 'Video harus ditonton sampai selesai sebelum lanjut ke angket.'),
+    li(form.video.length > 1 ? 'Mohon tonton kedua video sampai selesai sebelum mengisi angket, agar penilaian Anda utuh.' : 'Mohon tonton video sampai selesai sebelum mengisi angket, agar penilaian Anda utuh.'),
   );
 }
 
@@ -379,7 +383,8 @@ function isiVideo() {
   isiCara();
   $('lanjut-video').onclick = () => {
     if (semuaSelesai() || s.lewatiVideo) return ke('angket');
-    $('galat-video').textContent = form.video.length > 1 ? 'Tonton kedua video sampai habis dulu.' : 'Tonton video sampai habis dulu.';
+    const kurang = form.video.filter((v) => !(s.video[v.isi].selesai > 0)).map((v) => { const [d, dur] = ditonton(v); return d ? `${v.judul} baru ditonton ${mmdd(d)} dari ${mmdd(dur)}` : `${v.judul} belum ditonton`; });
+    $('galat-video').textContent = `${kurang.join('; ')}. Penilaian paling berguna bila video ditonton sampai habis, tetapi Anda tetap boleh lanjut ke angket.`;
     $('galat-video').hidden = false;
     $('lewati-video').hidden = false;
   };

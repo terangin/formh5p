@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { ringkas, kategori, skor, csv, petaTanda } from '../public/uji/hitung.js';
+import { ringkas, kategori, skor, csv, petaTanda, detikDitonton } from '../public/uji/hitung.js';
 
 const semua = (v) => Object.fromEntries(Array.from({ length: 25 }, (_, i) => [i + 1, v]));
 const baris = (butir, x = {}) => ({ id: 'a', mulai: '2026-11-13T10:00:00Z', selesai: '2026-11-13T10:30:00Z', butir, identitas: { prodi: 'PAI' }, video: { v1: { selesai: 1 } }, ...x });
@@ -69,4 +69,33 @@ test('penerima tanda terima kasih: cuma yang lengkap dan mau', () => {
   const p = penerimaHadiah([b('a', '2026-11-20T10:00:00Z', true), b('b', null, true), b('c', '2026-11-20T09:00:00Z', false)]);
   assert.deepEqual(p.map((x) => x.id), ['a']);
   assert.equal(csvHadiah([b('a', '2026-11-20T10:00:00Z', true)]).split('\r\n').length, 2);
+});
+
+test('detik ditonton: diulang nggak dobel, loncatan nggak dihitung, habis = penuh', () => {
+  const pos = (...d) => d.map((x, i) => [i * 5000, x]);
+  assert.equal(detikDitonton({ posisi: pos(4, 9, 14) }, 100), 14); // 0-14
+  assert.equal(detikDitonton({ posisi: pos(4, 9, 14, 6, 11, 16) }, 100), 16); // mundur, ulang 6-14
+  assert.equal(detikDitonton({ posisi: pos(4, 9, 60, 65) }, 100), 14); // geser 9 -> 60
+  assert.equal(detikDitonton({ posisi: pos(91, 96), selesai: 1 }, 100), 9); // 91-100, awal digeser
+  assert.equal(detikDitonton({ posisi: [] }, 100), 0);
+  assert.equal(detikDitonton(undefined, 100), 0);
+});
+
+import { cariGanda } from '../public/uji/hitung.js';
+test('ganda: NIM/email sama, yang selesai duluan yang dihitung', () => {
+  const r = (id, selesai, nim, email, nilai) => ({ id, mulai: '2026-11-13T09:00:00Z', selesai, butir: semua(nilai), identitas: { nim, email } });
+  const data = [
+    r('b', '2026-11-13T10:30:00Z', '123', 'A@ut.ac.id', 1), // email sama dengan a (beda huruf besar)
+    r('a', '2026-11-13T10:00:00Z', '123', 'a@ut.ac.id', 5),
+    r('c', '2026-11-13T11:00:00Z', '999', 'c@ut.ac.id', 5),
+    r('d', '2026-11-13T12:00:00Z', ' 999 ', 'lain@ut.ac.id', 1), // NIM sama dengan c (spasi)
+    r('e', null, '123', 'a@ut.ac.id', 1), // belum selesai: bukan ganda
+  ];
+  assert.deepEqual([...cariGanda(data)], [['b', 'a'], ['d', 'c']]);
+  const h = ringkas(data);
+  assert.equal(h.n, 2);
+  assert.equal(h.ganda, 2);
+  assert.equal(h.belumSelesai, 1);
+  assert.equal(h.butir[0].rata, 5); // jawaban 1 dari b dan d nggak ikut
+  assert.ok(csv(data, []).includes('"ganda","a"') || csv(data, []).includes('ganda,a'));
 });
