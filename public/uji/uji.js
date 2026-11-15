@@ -361,7 +361,7 @@ function perbaruiStatus() {
     st.classList.toggle('beres', !!x.selesai);
     st.classList.toggle('gagal', !!x.gagal);
   }
-  if (semuaSelesai()) $('galat-video').hidden = true;
+  if (semuaSelesai()) { $('galat-video').hidden = true; $('lanjut-video').textContent = 'Lanjut ke angket'; }
 }
 
 function isiCara() {
@@ -383,12 +383,13 @@ function isiVideo() {
   isiCara();
   $('lanjut-video').onclick = () => {
     if (semuaSelesai() || s.lewatiVideo) return ke('angket');
+    // Klik kedua setelah peringatan muncul = yakin lanjut. Satu tombol saja biar nggak bingung.
+    if (!$('galat-video').hidden) { s.lewatiVideo = new Date().toISOString(); return ke('angket'); }
     const kurang = form.video.filter((v) => !(s.video[v.isi].selesai > 0)).map((v) => { const [d, dur] = ditonton(v); return d ? `${v.judul} baru ditonton ${mmdd(d)} dari ${mmdd(dur)}` : `${v.judul} belum ditonton`; });
-    $('galat-video').textContent = `${kurang.join('; ')}. Penilaian paling berguna bila video ditonton sampai habis, tetapi Anda tetap boleh lanjut ke angket.`;
+    $('galat-video').textContent = `${kurang.join('; ')}. Yakin lanjut?`;
     $('galat-video').hidden = false;
-    $('lewati-video').hidden = false;
+    $('lanjut-video').textContent = 'Ya, lanjut';
   };
-  $('lewati-video').onclick = () => { s.lewatiVideo = new Date().toISOString(); ke('angket'); };
 }
 
 // ---------- angket ----------
