@@ -110,6 +110,7 @@ function isiPersetujuan() {
   const menit = Math.ceil((menitVideo + 15) / 5) * 5;
   $('teks-persetujuan').innerHTML = `
     <p class="pengantar">Tim peneliti Fakultas Keguruan dan Ilmu Pendidikan (FKIP) Universitas Terbuka mengundang Anda berpartisipasi dalam uji coba video pembelajaran mata kuliah <b></b>. Uji coba ini bertujuan menemukan kesalahan, bagian yang membingungkan, dan kendala teknis sebelum video digunakan secara lebih luas.</p>
+    ${form.cakupan ? `<p class="pengantar">${form.cakupan}</p>` : ''}
     <ul class="poin">
       <li><b>Perkiraan waktu sekitar ${menit} menit</b><span>Termasuk menonton ${nVideo} dengan total durasi sekitar ${menitVideo} menit, serta mengisi identitas, angket, dan catatan.</span></li>
       <li><b>Partisipasi bersifat sukarela</b><span>Anda dapat berhenti atau mengundurkan diri kapan saja tanpa perlu memberikan alasan.</span></li>
