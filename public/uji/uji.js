@@ -109,8 +109,7 @@ function isiPersetujuan() {
   const menitVideo = Math.round(form.video.reduce((a, v) => a + v.detik, 0) / 60);
   const menit = Math.ceil((menitVideo + 15) / 5) * 5;
   $('teks-persetujuan').innerHTML = `
-    <p class="pengantar">Tim peneliti Fakultas Keguruan dan Ilmu Pendidikan (FKIP) Universitas Terbuka mengundang Anda berpartisipasi dalam uji coba video pembelajaran mata kuliah <b></b>. Uji coba ini bertujuan menemukan kesalahan, bagian yang membingungkan, dan kendala teknis sebelum video digunakan secara lebih luas.</p>
-    ${form.cakupan ? `<p class="pengantar">${form.cakupan}</p>` : ''}
+    <p class="pengantar">${form.pengantar ?? `Tim peneliti dari Program Studi ${form.prodi} - FKIP Universitas Terbuka mengundang Anda berpartisipasi dalam uji coba video pembelajaran mata kuliah <b id="matkul-pengantar"></b>.`} Uji coba ini bertujuan menemukan kesalahan, bagian yang membingungkan, dan kendala teknis sebelum video digunakan secara lebih luas.</p>
     <ul class="poin">
       <li><b>Perkiraan waktu sekitar ${menit} menit</b><span>Termasuk menonton ${nVideo} dengan total durasi sekitar ${menitVideo} menit, serta mengisi identitas, angket, dan catatan.</span></li>
       <li><b>Partisipasi bersifat sukarela</b><span>Anda dapat berhenti atau mengundurkan diri kapan saja tanpa perlu memberikan alasan.</span></li>
@@ -149,7 +148,7 @@ function isiPersetujuan() {
         <li>Saya mengizinkan data yang saya berikan digunakan untuk keperluan penelitian ini sebagaimana dijelaskan di atas.</li>
       </ol>
     </div>`;
-  $('teks-persetujuan').querySelector('b').textContent = form.matkul;
+  if ($('matkul-pengantar')) $('matkul-pengantar').textContent = form.matkul;
   $('kontak-peneliti').replaceChildren(...form.kontak.map(([nama, prodi, hp]) => el('li', {},
     el('b', { textContent: nama }), `Dosen Program Studi ${prodi}`, el('a', { href: `tel:${hp.replace(/\D/g, '')}`, textContent: hp }))));
   const tombol = $('lanjut-persetujuan');

@@ -3,7 +3,8 @@ export const FORM = {
   'ut-tp': {
     matkul: 'Produksi Bahan Pembelajaran Berbasis Online (SPTP4401)', prodi: 'Teknologi Pendidikan', periksa: 'Check', majuDikunci: true,
     kontak: [['Dra. Marisa, M.Pd.', 'Teknologi Pendidikan', '0817-4825-201'], ['Dra. Susy Puspitasari, M.Pd.', 'Teknologi Pendidikan', '0857-7776-6201']],
-    cakupan: 'Instrumen ini digunakan untuk mengujicobakan 5 mata kuliah berpraktik di Program Studi Teknologi Pendidikan FKIP UT, yaitu Produksi Media Sederhana Tiga Dimensi, Perancangan Web Pembelajaran, Manajemen Penyiaran Televisi, Produksi Media Audio Video, dan Produksi Bahan Pembelajaran Online. Uji coba ini ditujukan untuk semua mahasiswa yang sudah mengambil salah satu mata kuliah berpraktik tersebut.',
+    // Kalimat pembuka dari dosen (2026-11-17). Form lain pakai pola yang sama dari `prodi` + `matkul` (uji.js isiPersetujuan).
+    pengantar: 'Tim peneliti dari Program Studi Teknologi Pendidikan - FKIP Universitas Terbuka mengundang Anda berpartisipasi dalam uji coba video pembelajaran untuk 5 mata kuliah berpraktik di Program Studi Teknologi Pendidikan FKIP UT, yaitu Produksi Media Sederhana Tiga Dimensi, Perancangan Web Pembelajaran, Manajemen Penyiaran Televisi, Produksi Media Audio Video, dan Produksi Bahan Pembelajaran Online. Uji coba ini ditujukan untuk semua mahasiswa yang sudah mengambil salah satu mata kuliah berpraktik tersebut.',
     video: [{ isi: 'tp1-8a082ca8', judul: 'Video Bagian 1', detik: 398 }, { isi: 'tp2-3a0b90ab', judul: 'Video Bagian 2', detik: 464 }],
   },
   'ut-bindo-1': {
