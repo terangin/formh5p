@@ -96,7 +96,7 @@ function ke(langkah) {
     li.className = j < i || langkah === 'selesai' ? 'lewat' : j === i ? 'kini' : '';
     if (j === i) li.setAttribute('aria-current', 'step'); else li.removeAttribute('aria-current');
   });
-  $('langkah-ke').textContent = i >= 0 ? `Langkah ${i + 1} dari ${LANGKAH.length}` : 'Selesai';
+  $('langkah-ke').textContent = i >= 0 ? `Langkah ${i + 1} dari ${LANGKAH.length}${langkah === 'catatan' ? ' · jawaban belum terkirim' : ''}` : 'Selesai, jawaban terkirim';
   if (langkah === 'angket') hitungButir();
   if (langkah === 'video') pasangVideo();
   if (langkah === 'catatan') gambarTanda();

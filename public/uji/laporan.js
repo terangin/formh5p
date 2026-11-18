@@ -119,7 +119,7 @@ function tampil(kode, baris) {
   const ganda = cariGanda(baris);
   $('responden').replaceChildren(tabel(['Nama', 'NIM', 'Email', 'Prodi', 'UPBJJ', 'Status', 'Tanggal uji coba', 'Mulai', 'Dikirim', 'Menit', 'Video ditonton', 'Wawancara', 'WhatsApp'],
     [...baris].sort((a, b) => a.mulai.localeCompare(b.mulai)).map((b) => [b.identitas?.nama, b.identitas?.nim, b.identitas?.email, b.identitas?.prodi, b.identitas?.upbjj,
-      ganda.has(b.id) ? 'Ganda, tidak dihitung' : b.selesai ? 'Lengkap' : 'Belum selesai', b.identitas?.tanggal, jamWib(b.mulai), b.selesai ? jamWib(b.selesai) : '–',
+      ganda.has(b.id) ? 'Ganda, tidak dihitung' : b.selesai ? (b.dikirimPeneliti ? 'Lengkap, dikirim peneliti (responden tidak menekan Kirim)' : 'Lengkap') : 'Belum selesai', b.identitas?.tanggal, jamWib(b.mulai), b.selesai ? jamWib(b.selesai) : '–',
       b.selesai ? angka((Date.parse(b.selesai) - Date.parse(b.mulai)) / 60000, 0) : '–',
       form.video.map((v) => `${persenDitonton(b.video?.[v.isi], b.video?.[v.isi]?.durasi || v.detik) ?? 0}%`).join(' · '), b.identitas?.bersedia_wawancara ? 'Ya' : 'Tidak', b.identitas?.whatsapp])));
 
