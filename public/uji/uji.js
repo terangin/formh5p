@@ -67,6 +67,8 @@ async function keServer(token) {
   } catch { return false; }
 }
 addEventListener('pagehide', () => { if (s?.terdaftar && !s.selesai) keServer(); });
+// Belum menekan Kirim: browser minta konfirmasi sebelum tab ditutup/pindah (teksnya bawaan browser, nggak bisa diganti).
+addEventListener('beforeunload', (e) => { if (s?.terdaftar && !s.selesai && !LOKAL) e.preventDefault(); });
 
 // Turnstile cuma di langkah persetujuan. Token sekali pakai: gagal = reset widget, minta token baru.
 let tokenTurnstile = null, idWidget;
