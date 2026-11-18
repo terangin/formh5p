@@ -19,6 +19,13 @@ export const FORM = {
   },
   'ut-pai': {
     matkul: 'Nahwu dan Sharaf (SPAI4201)', prodi: 'Pendidikan Agama Islam (PAI)', periksa: 'Check', majuDikunci: false, tombolLompat: true,
+    // Penjelasan video dari dosen (2026-11-18), tampil di lembar persetujuan apa adanya.
+    tentang: [
+      'Video pembelajaran ini dikembangkan sebagai bagian dari inovasi bahan ajar digital untuk mendukung proses pembelajaran mata kuliah Nahwu dan Sharaf pada Program Studi Pendidikan Agama Islam (PAI), Fakultas Keguruan dan Ilmu Pendidikan (FKIP), Universitas Terbuka.',
+      'Pengembangan video ini bertujuan untuk memfasilitasi mahasiswa dalam memahami konsep dasar tata bahasa Arab, khususnya ilmu Nahwu yang berkaitan dengan struktur dan kedudukan kata dalam kalimat, serta ilmu Sharaf yang membahas perubahan bentuk kata dan implikasinya terhadap makna.',
+      'Melalui penyajian materi yang sistematis, komunikatif, dan dilengkapi contoh-contoh aplikatif, video pembelajaran ini diharapkan dapat meningkatkan pemahaman konseptual, keterampilan analisis kebahasaan, serta kemandirian belajar mahasiswa dalam sistem pendidikan terbuka dan jarak jauh.',
+      'Selain berfungsi sebagai sumber belajar, video ini juga menjadi bagian dari upaya pengembangan dan evaluasi efektivitas media pembelajaran digital yang adaptif, interaktif, dan berorientasi pada kebutuhan mahasiswa.',
+    ],
     kontak: [['Muhammad Sulaiman, S.Pd.I., B.I.S., M.Pd.', 'Pendidikan Agama Islam', '0811-7199-888']],
     video: [{ isi: 'lumi-59763deb', judul: 'Video Pembelajaran Pendidikan Agama Islam', detik: 927 }],
   },

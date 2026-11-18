@@ -132,6 +132,7 @@ function isiPersetujuan() {
       <li><b>Tidak memengaruhi nilai akademik</b><span>Keikutsertaan maupun jawaban Anda tidak berpengaruh pada nilai mata kuliah. Tidak ada jawaban yang benar atau salah.</span></li>
       <li><b>Kerahasiaan data terjaga</b><span>Data hanya digunakan oleh tim peneliti untuk penelitian ini, dan hasilnya dilaporkan tanpa menyebut nama Anda.</span></li>
     </ul>
+    ${form.tentang ? `<h3>Tentang video ini</h3>${form.tentang.map((p) => `<p>${p}</p>`).join('')}` : ''}
     <h3>Prosedur</h3>
     <ol class="alur">
       <li>Mengisi identitas</li>
