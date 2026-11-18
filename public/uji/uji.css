@@ -15,6 +15,10 @@ h1, h2, h3 { color: var(--navy-tua); line-height: 1.25; letter-spacing: -.01em; 
 a { color: var(--navy); }
 .halaman { max-width: 760px; margin: 0 auto; padding: 20px 16px 56px; }
 .kecil { font-size: 15px; color: var(--teks-pudar); }
+.status-kirim { position: sticky; top: 0; z-index: 5; margin: 14px 0 0; padding: 10px 16px; border-radius: 12px; border: 2px solid var(--kuning); background: var(--kuning-muda); color: var(--navy-tua); font-size: 15px; box-shadow: var(--bayang); }
+.status-kirim a { color: var(--navy-tua); font-weight: 700; }
+#kirim { scroll-margin-top: 50vh; }
+.status-kirim.terkirim { border-color: var(--hijau); background: var(--hijau-muda); color: var(--hijau); }
 .pengingat { margin: 0 0 18px; padding: 12px 16px; border-left: 4px solid var(--kuning); border-radius: 10px; background: var(--kuning-muda); color: var(--navy-tua); }
 .galat { color: var(--merah); background: var(--merah-muda); border-radius: 10px; padding: 10px 14px; font-weight: 700; }
 :focus-visible { outline: 3px solid var(--kuning); outline-offset: 3px; }

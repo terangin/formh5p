@@ -86,6 +86,19 @@ function pasangTurnstile(siap) {
   document.head.append(skrip);
 }
 
+// Bilah status yang nempel di atas layar: belum terkirim (kuning) sampai Kirim berhasil (hijau).
+// Browser nggak ngizinin teks sendiri di konfirmasi keluar, jadi kejelasannya ditaruh di sini.
+function statusKirim(langkah) {
+  const b = $('status-kirim');
+  b.hidden = langkah === 'persetujuan' || langkah === 'tolak';
+  b.classList.toggle('terkirim', langkah === 'selesai');
+  if (langkah === 'selesai') return b.replaceChildren(el('b', { textContent: 'Jawaban Anda sudah terkirim.' }), ' Terima kasih.');
+  b.replaceChildren(el('b', { textContent: 'Jawaban Anda belum terkirim.' }), ' ',
+    langkah === 'catatan'
+      ? el('a', { href: '#kirim', textContent: 'Tekan Kirim jawaban di bagian paling bawah' })
+      : 'Selesaikan semua langkah, lalu tekan Kirim jawaban di langkah terakhir.');
+}
+
 function ke(langkah) {
   s.langkah = langkah;
   s.waktuLangkah[langkah] ??= new Date().toISOString();
@@ -96,7 +109,8 @@ function ke(langkah) {
     li.className = j < i || langkah === 'selesai' ? 'lewat' : j === i ? 'kini' : '';
     if (j === i) li.setAttribute('aria-current', 'step'); else li.removeAttribute('aria-current');
   });
-  $('langkah-ke').textContent = i >= 0 ? `Langkah ${i + 1} dari ${LANGKAH.length}${langkah === 'catatan' ? ' · jawaban belum terkirim' : ''}` : 'Selesai, jawaban terkirim';
+  $('langkah-ke').textContent = i >= 0 ? `Langkah ${i + 1} dari ${LANGKAH.length}` : 'Selesai';
+  statusKirim(langkah);
   if (langkah === 'angket') hitungButir();
   if (langkah === 'video') pasangVideo();
   if (langkah === 'catatan') gambarTanda();
